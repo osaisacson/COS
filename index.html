@@ -8,15 +8,11 @@
   
     <style>
         body { background-color: #fff; font-family: 'Inter', sans-serif; }
-        .form-input { border: 1px solid #ff9800; border-radius: 0.25rem; padding: 0.5rem 0.75rem; }
-        .action-button { background-color: #6c757d; color: white; font-weight: 600; padding: 0.75rem 1.5rem; border-radius: 0.25rem; transition: background-color 0.2s; }
+        .form-input { border: 1px solid #ff9800; border-radius: 0.25rem; padding: 0.5rem 0.75rem; width: 100%; }
+        .action-button { background-color: #6c757d; color: white; font-weight: 600; padding: 0.75rem 1.5rem; border-radius: 0.25rem; transition: background-color 0.2s; display: inline-block; text-align: center; }
         .action-button:hover { background-color: #495057; }
         .action-button.active { background-color: #000; }
-        .feature-checkbox.accent-yellow-400:checked { accent-color: #facc15; }
-        .feature-checkbox.accent-pink-400:checked { accent-color: #f472b6; }
-        .feature-checkbox.accent-purple-400:checked { accent-color: #a78bfa; }
-        .feature-checkbox.accent-blue-400:checked { accent-color: #60a5fa; }
-        .feature-checkbox.accent-green-400:checked { accent-color: #4ade80; }
+        .feature-checkbox { accent-color: #a78bfa; width: 1.25rem; height: 1.25rem; }
         /* Custom slider styles */
         input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
         input[type=range]:focus { outline: none; }
@@ -30,6 +26,14 @@
         .caret-open { transform: rotate(90deg); }
         .page-content { display: none; }
         .page-content.active { display: block; }
+        .admin-table { width: 100%; border-collapse: collapse; }
+        .admin-table th, .admin-table td { border: 1px solid #e2e8f0; padding: 8px; text-align: left; font-size: 0.875rem; vertical-align: top; }
+        .admin-table th { background-color: #f8fafc; }
+        .hidden { display: none; }
+        .admin-table .edit-mode-item { display: flex; justify-content: space-between; align-items: center; padding: 2px 0; }
+        .new-flag { background-color: #22c55e; color: white; font-size: 0.65rem; font-weight: bold; padding: 2px 5px; border-radius: 9999px; margin-left: 8px; }
+        .admin-table .view-mode ul { list-style-position: inside; padding-left: 4px; margin: 0; }
+        .admin-table .view-mode li::marker { content: '• '; }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -79,87 +83,73 @@
             <!-- Main Actions -->
             <section id="main-actions-section" class="border-t pt-12 mt-12">
                  <div class="flex space-x-4 items-center">
-                    <button id="show-assemble-button" class="action-button">Assemble your COS</button>
-                    <button id="show-evaluate-button" class="action-button">Evaluate technologies</button>
-                    <span id="version-tracker" class="text-xs text-gray-500"></span>
+                    <a href="#assemble" class="action-button nav-link">Assemble your COS</a>
+                    <a href="#evaluate" class="action-button nav-link">Evaluate technologies</a>
                  </div>
             </section>
-
-            <!-- 5a. Assemble COS View -->
-            <section id="assemble-view" class="pt-12 mt-12 border-t hidden">
-                <div class="grid md:grid-cols-2 gap-8 relative">
-                    <div class="absolute top-0 bottom-0 left-1/2 w-px bg-gray-200"></div>
-                    <div class="pr-8">
-                        <h3 class="text-2xl font-bold">ASSEMBLY</h3>
-                        <p class="text-gray-600 mt-2">Below are functions & associated features others have found useful in setting up the scaffolding for their group.</p>
-                        <p class="mt-4 font-semibold">Select which of them are relevant to you. Your choices construct a suggested COS with technology components matching your particular needs to the right &rarr;</p>
-                        <div id="assemble-functions-container" class="mt-6 space-y-6"></div>
-                    </div>
-                    <div class="pl-8">
-                        <h3 class="text-2xl font-bold">COS</h3>
-                        <p class="text-gray-600 mt-2">The below list is filtered both by your choices to the left, and by the information in your group setup above (size, tech proficiency etc). <a href="#" class="text-blue-600 underline">See all curated components.</a></p>
-                        <div id="assemble-results-container" class="mt-6 space-y-6"></div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 5b. Evaluate Technologies View -->
-            <section id="evaluate-view" class="pt-12 mt-12 border-t hidden">
-                 <div class="max-w-2xl mx-auto">
-                    <h3 class="text-2xl font-bold">EVALUATION</h3>
-                    <div class="mt-6 space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium">Which technology are we talking about?</label>
-                            <select id="evaluate-tech-select" class="form-input w-full mt-1"></select>
-                            <input type="text" id="new-technology-input" class="form-input w-full mt-2 text-sm" placeholder="Add a new technology...">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium">Needed level of tech proficiency</label>
-                            <select id="evaluate-tech-proficiency" class="form-input w-full mt-1"></select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium">Filter features by function</label>
-                            <select id="evaluate-function-select" class="form-input w-full mt-1"></select>
-                        </div>
-                        <div id="features-wrapper" class="hidden">
-                            <label class="block text-sm font-medium">What features does it have? Aka, how is it useful in supporting your purpose?</label>
-                            <div id="evaluate-features-container" class="mt-1 p-2 border border-gray-300 rounded-md max-h-32 overflow-y-auto"></div>
-                             <input type="text" id="new-feature-input" class="form-input w-full mt-2 text-sm" placeholder="Add a new feature...">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium">Which purposes does it support?</label>
-                            <div id="evaluate-purposes-container" class="mt-1 p-2 border border-gray-300 rounded-md max-h-32 overflow-y-auto"></div>
-                            <input type="text" id="new-purpose-input" class="form-input w-full mt-2 text-sm" placeholder="Add a new purpose...">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium">Comments</label>
-                            <textarea id="evaluation-comment" class="form-input w-full mt-1" rows="3" placeholder="Your review of how this was useful/not useful for your group."></textarea>
-                        </div>
-                        <div id="conviviality-questions" class="space-y-4 pt-2">
-                             <label class="block text-sm font-medium">Conviviality Questions</label>
-                             <div class="space-y-3 text-xs text-gray-600">
-                                <div>
-                                    <label>Is it easy to learn and use?</label>
-                                    <input type="range" min="1" max="10" value="5" class="w-full mt-1" data-conv-id="ease">
-                                </div>
-                                <div>
-                                    <label>Does it allow for user modification and adaptation?</label>
-                                    <input type="range" min="1" max="10" value="5" class="w-full mt-1" data-conv-id="adaptation">
-                                </div>
-                                 <div>
-                                    <label>Does it respect user autonomy and privacy?</label>
-                                    <input type="range" min="1" max="10" value="5" class="w-full mt-1" data-conv-id="autonomy">
-                                </div>
-                             </div>
-                        </div>
-                        <div class="flex space-x-4 pt-2">
-                            <button id="save-evaluation-button" class="action-button">Save</button>
-                        </div>
-                        <p id="save-confirmation-message" class="text-sm text-green-600 mt-4 hidden"></p>
-                    </div>
-                </div>
-            </section>
         </main>
+
+        <!-- 5a. Assemble COS Page -->
+        <section id="assemble-page" class="page-content pt-12">
+            <div class="grid md:grid-cols-2 gap-8 relative">
+                <div class="absolute top-0 bottom-0 left-1/2 w-px bg-gray-200"></div>
+                <div class="pr-8">
+                    <h3 class="text-2xl font-bold">ASSEMBLY</h3>
+                    <p class="text-gray-600 mt-2">Below are features others have found useful in setting up operational support for their group.</p>
+                    <div id="assemble-features-container" class="mt-6 space-y-2"></div>
+                </div>
+                <div class="pl-8">
+                    <h3 class="text-2xl font-bold">COS</h3>
+                    <p class="text-gray-600 mt-2">The below list is ranked by how well they match your choices on the left.</p>
+                    <div id="assemble-results-container" class="mt-6 space-y-6"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5b. Evaluate Technologies Page -->
+        <section id="evaluate-page" class="page-content pt-12">
+             <div class="max-w-2xl mx-auto">
+                <h3 class="text-2xl font-bold">EVALUATION</h3>
+                <div id="evaluate-form-container" class="mt-6 space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium">Which technology are we talking about?</label>
+                        <select id="evaluate-tech-select" class="form-input w-full mt-1"></select>
+                        <input type="text" id="new-technology-input" class="form-input w-full mt-2 text-sm" placeholder="Add a new technology...">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium">Needed level of tech proficiency</label>
+                        <select id="evaluate-tech-proficiency" class="form-input w-full mt-1"></select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium">Filter features by function</label>
+                        <select id="evaluate-function-select" class="form-input w-full mt-1"></select>
+                    </div>
+                    <div id="features-wrapper" class="hidden">
+                        <label class="block text-sm font-medium">What features does it have? Aka, how is it useful in supporting your purpose?</label>
+                        <div id="evaluate-features-container" class="mt-1 p-2 border border-gray-300 rounded-md max-h-32 overflow-y-auto"></div>
+                         <input type="text" id="new-feature-input" class="form-input w-full mt-2 text-sm" placeholder="Add a new feature...">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium">Which purposes does it support?</label>
+                        <div id="evaluate-purposes-container" class="mt-1 p-2 border border-gray-300 rounded-md max-h-32 overflow-y-auto"></div>
+                        <input type="text" id="new-purpose-input" class="form-input w-full mt-2 text-sm" placeholder="Add a new purpose...">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium">Comments</label>
+                        <textarea id="evaluation-comment" class="form-input w-full mt-1" rows="3" placeholder="Your review of how this was useful/not useful for your group."></textarea>
+                    </div>
+                    <div id="conviviality-questions" class="space-y-4 pt-2">
+                         <label class="block text-sm font-medium">Conviviality Questions</label>
+                         <div id="conviviality-sliders-container" class="space-y-3 text-xs text-gray-600">
+                         </div>
+                    </div>
+                    <div class="flex space-x-4 pt-2">
+                        <button id="save-evaluation-button" class="action-button">Save</button>
+                    </div>
+                    <p id="save-confirmation-message" class="text-sm text-green-600 mt-4 hidden"></p>
+                </div>
+            </div>
+        </section>
 
         <section id="all-tech-page" class="page-content pt-12">
              <h1 class="text-4xl font-bold mb-8">All Technologies</h1>
@@ -211,24 +201,50 @@
                 <p>To answer this, the research moves from theory to practice:</p>
                 <ul class="list-disc list-inside ml-4 space-y-2">
                     <li>**Exploring the Tools:** Mapping the landscape of post-2004 technologies (like collaborative commons and decentralised production) that could be useful for post-growth aims.</li>
-                    <li>**Understanding the Actors:** Interviewing members of alternative groups to understand their context, needs, and the real-world barriers to adopting new technologies.</li>
+                    <li>**Understanding the Actors:** Interviewing members of an alternative group to understand their context, needs, and the real-world barriers to adopting new technologies.</li>
                     <li>**Building the Bridge:** This application, the Convivial Operating System (COS), is the synthesis of that research—a practical tool designed to help groups find, evaluate, and assemble their own set of supportive, value-aligned technologies.</li>
                 </ul>
              </div>
         </section>
+        
+        <section id="admin-login-page" class="page-content pt-12">
+            <div class="max-w-md mx-auto">
+                <h2 class="text-2xl font-bold mb-4">Admin Login</h2>
+                <form id="admin-login-form" class="space-y-4">
+                    <div>
+                        <label for="admin-email" class="block text-sm font-medium">Email</label>
+                        <input type="email" id="admin-email" class="form-input w-full mt-1" value="admin@cos.com">
+                    </div>
+                    <div>
+                        <label for="admin-password" class="block text-sm font-medium">Password</label>
+                        <input type="password" id="admin-password" class="form-input w-full mt-1" value="password">
+                    </div>
+                    <p id="admin-login-error" class="text-red-500 text-sm hidden">Invalid credentials.</p>
+                    <button type="submit" class="action-button">Login</button>
+                </form>
+            </div>
+        </section>
+        
+        <section id="admin-dashboard-page" class="page-content pt-12">
+            <h1 class="text-4xl font-bold mb-8">Admin Dashboard</h1>
+            <div id="admin-dashboard-container" class="space-y-12"></div>
+        </section>
+
+        <footer class="text-right py-8 mt-12 border-t">
+            <a href="#admin-login" id="admin-login-link" class="nav-link text-xs text-gray-500 hover:text-black">Admin Login</a>
+        </footer>
     </div>
 
     <script>
     document.addEventListener('DOMContentLoaded', () => {
         // --- DATA ---
         const appData = {
-            version: 1.0,
             functions: [
-                { id: 'comm', name: 'Communication', color: 'bg-yellow-400', accent: 'accent-yellow-400' },
-                { id: 'econ', name: 'Economy', color: 'bg-pink-400', accent: 'accent-pink-400' },
-                { id: 'admin', name: 'Admin', color: 'bg-purple-400', accent: 'accent-purple-400' },
-                { id: 'commons', name: 'Commons', color: 'bg-blue-400', accent: 'accent-blue-400' },
-                { id: 'conn', name: 'Connection', color: 'bg-green-400', accent: 'accent-green-400' },
+                { id: 'comm', name: 'Communication', color: '#facc15', accent: 'accent-yellow-400' },
+                { id: 'econ', name: 'Economy', color: '#f472b6', accent: 'accent-pink-400' },
+                { id: 'admin', name: 'Admin', color: '#a78bfa', accent: 'accent-purple-400' },
+                { id: 'commons', name: 'Commons', color: '#60a5fa', accent: 'accent-blue-400' },
+                { id: 'conn', name: 'Connection', color: '#4ade80', accent: 'accent-green-400' },
             ],
             features: [
                 {id: 'f1', name: 'Find and connect with others interested in the group', functionId: 'comm'},
@@ -277,24 +293,39 @@
                 { id: 'p2', name: 'Own property' },
                 { id: 'p3', name: 'Be self-sufficient in energy' }
             ],
+            convivialityQuestions: [
+                { id: 'ease', question: 'Is it easy to learn and use?' },
+                { id: 'adaptation', question: 'Does it allow for user modification and adaptation?' },
+                { id: 'autonomy', question: 'Does it respect user autonomy and privacy?' },
+            ]
         };
 
         const dataService = {
-            getVersion: () => appData.version,
-            incrementVersion: () => { appData.version = parseFloat((appData.version + 0.1).toFixed(1)); },
+            // GETTERS
             getFunctions: () => appData.functions,
             getFeatures: () => appData.features,
+            getTechnologies: () => appData.technologies,
+            getPurposes: () => appData.purposes,
+            getTechProficiencyLevels: () => appData.techProficiencyLevels,
+            getConvivialityQuestions: () => appData.convivialityQuestions,
             getFeaturesByFunction: (functionId) => appData.features.filter(f => f.functionId === functionId),
             getFeatureById: (id) => appData.features.find(f => f.id === id),
-            addFeature: (name, functionId) => {
-                const newFeature = { id: `f${appData.features.length + 1}`, name, functionId };
-                appData.features.push(newFeature);
-                return newFeature;
-            },
-            getTechnologies: () => appData.technologies,
             getTechnologyById: (id) => appData.technologies.find(t => t.id === id),
+            
+            // ADDERS
+            addFunction: (name) => {
+                const colors = ['#facc15', '#f472b6', '#a78bfa', '#60a5fa', '#4ade80', '#f87171', '#818cf8'];
+                const accents = ['accent-yellow-400', 'accent-pink-400', 'accent-purple-400', 'accent-blue-400', 'accent-green-400', 'accent-red-400', 'accent-indigo-400'];
+                const nextColorIndex = appData.functions.length % colors.length;
+                const newFunc = { id: `func${Date.now()}`, name, color: colors[nextColorIndex], accent: accents[nextColorIndex] };
+                appData.functions.push(newFunc);
+            },
+            addFeature: (name, functionId) => {
+                const newFeature = { id: `f${Date.now()}`, name, functionId, isNew: true };
+                appData.features.push(newFeature);
+            },
             addTechnology: (name) => {
-                const newTech = { id: appData.technologies.length + 1, name, evaluations: [] };
+                const newTech = { id: Date.now(), name, evaluations: [] };
                 appData.technologies.push(newTech);
                 return newTech;
             },
@@ -302,28 +333,93 @@
                 const tech = dataService.getTechnologyById(techId);
                 if (tech) tech.evaluations.push(evaluationData);
             },
-            getPurposes: () => appData.purposes,
             addPurpose: (name) => {
-                const newPurpose = { id: `p${appData.purposes.length + 1}`, name };
-                appData.purposes.push(newPurpose);
-                return newPurpose;
+                appData.purposes.push({ id: `p${Date.now()}`, name });
             },
-            getTechProficiencyLevels: () => appData.techProficiencyLevels,
+             addTechProficiency: (name) => {
+                const maxLevel = Math.max(0, ...appData.techProficiencyLevels.map(l => l.id));
+                appData.techProficiencyLevels.push({ id: maxLevel + 1, name });
+            },
+            addConvivialityQuestion: (question) => {
+                appData.convivialityQuestions.push({ id: `conv${Date.now()}`, question });
+            },
+            
+            // UPDATERS
+            updateFunction: (id, newName, newColor) => {
+                const func = appData.functions.find(f => f.id == id);
+                if (func) {
+                    func.name = newName;
+                    func.color = newColor;
+                    // Note: accent color is not updated, as it's tied to tailwind classes
+                }
+            },
+            updateFeature: (id, newName, newFunctionId) => {
+                const feature = appData.features.find(f => f.id == id);
+                if (feature) {
+                    feature.name = newName;
+                    feature.functionId = newFunctionId;
+                }
+            },
+            updateTechnology: (id, newName, featureIds) => {
+                const tech = appData.technologies.find(t => t.id == id);
+                if (tech) {
+                    tech.name = newName;
+                    // This logic finds or creates a special "admin" evaluation to hold the canonical feature list
+                    let adminEval = tech.evaluations.find(ev => ev.isAdminAssigned);
+                    if (adminEval) {
+                        adminEval.features = featureIds;
+                    } else {
+                        tech.evaluations.push({ 
+                            features: featureIds, 
+                            isAdminAssigned: true,
+                            comment: "Admin-assigned features.", 
+                            convivialityScore: 0, 
+                            techProficiency: 0, 
+                            purposes: [] 
+                        });
+                    }
+                }
+            },
+             updatePurpose: (id, newName) => {
+                const item = appData.purposes.find(p => p.id == id);
+                if (item) item.name = newName;
+            },
+            updateTechProficiency: (id, newName) => {
+                const item = appData.techProficiencyLevels.find(l => l.id == id);
+                if (item) item.name = newName;
+            },
+            updateConvivialityQuestion: (id, newQuestion) => {
+                const item = appData.convivialityQuestions.find(q => q.id == id);
+                if (item) item.question = newQuestion;
+            },
+
+            // DELETERS
+            deleteFunction: (id) => {
+                appData.functions = appData.functions.filter(f => f.id != id);
+                appData.features = appData.features.filter(f => f.functionId != id);
+            },
+            deleteFeature: (id) => {
+                appData.features = appData.features.filter(f => f.id != id);
+            },
+            deleteTechnology: (id) => {
+                appData.technologies = appData.technologies.filter(t => t.id != id);
+            },
+            deletePurpose: (id) => {
+                appData.purposes = appData.purposes.filter(p => p.id != id);
+            },
+            deleteTechProficiency: (id) => {
+                appData.techProficiencyLevels = appData.techProficiencyLevels.filter(l => l.id != id);
+            },
+             deleteConvivialityQuestion: (id) => {
+                appData.convivialityQuestions = appData.convivialityQuestions.filter(q => q.id != id);
+            }
         };
 
         // --- ELEMENTS ---
         const pageContents = document.querySelectorAll('.page-content');
-        const navLinks = document.querySelectorAll('.nav-link');
         const homeLogo = document.getElementById('home-logo');
         const allTechListContainer = document.getElementById('all-tech-list-container');
-        const sections = {
-            assembleView: document.getElementById('assemble-view'),
-            evaluateView: document.getElementById('evaluate-view'),
-        };
-        const showAssembleButton = document.getElementById('show-assemble-button');
-        const showEvaluateButton = document.getElementById('show-evaluate-button');
-        const versionTracker = document.getElementById('version-tracker');
-        const assembleFunctionsContainer = document.getElementById('assemble-functions-container');
+        const assembleFeaturesContainer = document.getElementById('assemble-features-container');
         const assembleResultsContainer = document.getElementById('assemble-results-container');
         const evaluateTechSelect = document.getElementById('evaluate-tech-select');
         const newTechnologyInput = document.getElementById('new-technology-input');
@@ -336,53 +432,50 @@
         const newPurposeInput = document.getElementById('new-purpose-input');
         const saveEvaluationButton = document.getElementById('save-evaluation-button');
         const evaluationComment = document.getElementById('evaluation-comment');
-        const convivialityQuestions = document.getElementById('conviviality-questions');
+        const convivialitySlidersContainer = document.getElementById('conviviality-sliders-container');
         const saveConfirmationMessage = document.getElementById('save-confirmation-message');
+        const adminLoginForm = document.getElementById('admin-login-form');
+        const adminDashboardContainer = document.getElementById('admin-dashboard-container');
 
         // --- HELPERS ---
         const getAggregateData = (technology) => {
-            if (technology.evaluations.length === 0) {
-                return { 
-                    conviviality: null, 
-                    proficiency: null,
-                    features: [],
-                    functionIds: [],
-                    purposes: []
-                };
-            }
-            const totalConv = technology.evaluations.reduce((sum, ev) => sum + ev.convivialityScore, 0);
-            const totalProf = technology.evaluations.reduce((sum, ev) => sum + ev.techProficiency, 0);
-            const allEvalFeatures = [...new Set(technology.evaluations.flatMap(ev => ev.features))];
-            const allEvalPurposes = [...new Set(technology.evaluations.flatMap(ev => ev.purposes))];
+            const adminEval = technology.evaluations.find(ev => ev.isAdminAssigned);
+            const userEvals = technology.evaluations.filter(ev => !ev.isAdminAssigned);
+
+            const features = adminEval ? adminEval.features : [...new Set(userEvals.flatMap(ev => ev.features))];
             
-            const allEvalFunctions = allEvalFeatures.map(featureId => {
+            const functionIds = [...new Set(features.map(featureId => {
                 const feature = dataService.getFeatureById(featureId);
                 return feature ? feature.functionId : null;
-            }).filter(Boolean);
+            }).filter(Boolean))];
+
+            if (userEvals.length === 0) {
+                 return { conviviality: null, proficiency: null, features, functionIds };
+            }
+
+            const totalConv = userEvals.reduce((sum, ev) => sum + ev.convivialityScore, 0);
+            const totalProf = userEvals.reduce((sum, ev) => sum + ev.techProficiency, 0);
 
             return {
-                conviviality: totalConv / technology.evaluations.length,
-                proficiency: totalProf / technology.evaluations.length,
-                features: allEvalFeatures,
-                functionIds: [...new Set(allEvalFunctions)],
-                purposes: allEvalPurposes
+                conviviality: totalConv / userEvals.length,
+                proficiency: totalProf / userEvals.length,
+                features,
+                functionIds
             };
         };
         
         const getScoreColor = (score, type) => {
             if (score === null) return 'text-gray-700';
-            let colorClass = 'text-gray-700';
-            // Scale is 1-10 for conviviality, 1-5 for tech
-            if (type === 'conviviality') { // low is bad (red), high is good (green)
-                if (score >= 7) colorClass = 'text-green-600';
-                else if (score >= 4) colorClass = 'text-yellow-600';
-                else colorClass = 'text-red-600';
-            } else if (type === 'tech') { // low is good (green), high is bad (red)
-                if (score >= 4) colorClass = 'text-red-600';
-                else if (score >= 2.5) colorClass = 'text-yellow-600';
-                else colorClass = 'text-green-600';
+            if (type === 'conviviality') {
+                if (score >= 7) return 'text-green-600';
+                else if (score >= 4) return 'text-yellow-600';
+                else return 'text-red-600';
+            } else if (type === 'tech') {
+                if (score >= 4) return 'text-red-600';
+                else if (score >= 2.5) return 'text-yellow-600';
+                else return 'text-green-600';
             }
-            return colorClass;
+            return 'text-gray-700';
         };
 
         // --- STATE MANAGEMENT ---
@@ -390,24 +483,27 @@
             pageContents.forEach(page => {
                 if (page.id === pageId) {
                     page.classList.add('active');
+                    // Run page-specific render functions
+                    if(page.id === 'assemble-page') {
+                        renderAssembleView();
+                        renderAssembleResults();
+                    }
+                    if(page.id === 'evaluate-page') {
+                        renderEvaluateView();
+                    }
+                    if(page.id === 'all-tech-page') {
+                        renderAllTechnologiesList(allTechListContainer, 'all_tech');
+                    }
+                    if(page.id === 'admin-dashboard-page') {
+                        renderAdminDashboard();
+                    }
                 } else {
                     page.classList.remove('active');
                 }
             });
         };
         
-        const showAppSection = (sectionName) => {
-            Object.values(sections).forEach(s => s.classList.add('hidden'));
-            if (sections[sectionName]) {
-                sections[sectionName].classList.remove('hidden');
-            }
-        };
-
         // --- RENDER FUNCTIONS ---
-        const updateVersionTracker = () => {
-            versionTracker.textContent = `Version ${dataService.getVersion().toFixed(1)}`;
-        };
-
         const populateTechProficiencyDropdowns = () => {
             const dropdown = document.getElementById('evaluate-tech-proficiency');
             if(!dropdown) return;
@@ -419,105 +515,116 @@
                 dropdown.appendChild(option);
             });
         };
+
+        const renderConvivialitySliders = () => {
+            convivialitySlidersContainer.innerHTML = dataService.getConvivialityQuestions().map(q => `
+                <div>
+                    <label>${q.question}</label>
+                    <input type="range" min="1" max="10" value="5" class="w-full mt-1" data-conv-id="${q.id}">
+                </div>
+            `).join('');
+        };
         
         const renderAssembleView = () => {
-            assembleFunctionsContainer.innerHTML = '';
-            dataService.getFunctions().forEach(func => {
-                const featuresForFunc = dataService.getFeaturesByFunction(func.id);
-                const featuresHTML = featuresForFunc.map(feat => `
+            const allFeatures = dataService.getFeatures();
+            assembleFeaturesContainer.innerHTML = allFeatures.map(feat => {
+                const newFlag = feat.isNew ? '<span class="new-flag">new</span>' : '';
+                return `
                     <label class="flex items-center space-x-3 cursor-pointer">
-                        <input type="checkbox" value="${feat.id}" class="feature-checkbox h-5 w-5 rounded border-gray-400 ${func.accent}">
+                        <input type="checkbox" value="${feat.id}" class="feature-checkbox">
                         <span class="text-gray-700">${feat.name}</span>
+                        ${newFlag}
                     </label>
-                `).join('');
-                const funcEl = document.createElement('div');
-                funcEl.innerHTML = `
-                    <div class="flex items-center space-x-3">
-                        <div class="w-5 h-5 ${func.color}"></div>
-                        <h4 class="text-lg font-semibold">${func.name}</h4>
-                    </div>
-                    <div class="pl-8 mt-2 space-y-2">${featuresHTML}</div>
                 `;
-                assembleFunctionsContainer.appendChild(funcEl);
-            });
+            }).join('');
         };
         
         const renderAssembleResults = (selectedFeatureIds = []) => {
             assembleResultsContainer.innerHTML = '';
-            const relevantFunctionIds = new Set();
-            let hasResults = false;
-
-            if (selectedFeatureIds.length > 0) {
-                const filteredTech = dataService.getTechnologies().filter(tech => {
-                    const aggData = getAggregateData(tech);
-                    return aggData.features.some(fid => selectedFeatureIds.includes(fid));
-                });
-
-                filteredTech.forEach(tech => {
-                    const aggData = getAggregateData(tech);
-                    aggData.functionIds.forEach(fid => relevantFunctionIds.add(fid));
-                });
-
-                dataService.getFunctions().forEach(func => {
-                    if (relevantFunctionIds.has(func.id)) {
-                        const techForFunc = filteredTech.filter(t => getAggregateData(t).functionIds.includes(func.id));
-                         if (techForFunc.length === 0) return;
-                         hasResults = true;
-                        
-                        const techHTML = techForFunc.map(t => {
-                            const scores = getAggregateData(t);
-                            const convivialityColor = getScoreColor(scores.conviviality, 'conviviality');
-                            const techColor = getScoreColor(scores.proficiency, 'tech');
-                            const convScoreText = scores.conviviality !== null ? scores.conviviality.toFixed(1) : '-';
-                            const techScoreText = scores.proficiency !== null ? scores.proficiency.toFixed(1) : '-';
-
-                            return `
-                                <div>
-                                    <div class="flex justify-between items-center text-sm py-1">
-                                        <div class="flex items-center tech-name-button" data-tech-id="${t.id}">
-                                            <span class="caret">&#9656;</span>
-                                            <span>${t.name}</span>
-                                        </div>
-                                        <div class="flex">
-                                            <span class="font-semibold w-24 text-center ${convivialityColor}">${convScoreText}</span>
-                                            <span class="font-semibold w-24 text-center ${techColor}">${techScoreText}</span>
-                                        </div>
-                                    </div>
-                                    <div id="comments-assemble-${t.id}" class="hidden text-xs text-gray-600 pl-8 py-2 border-l-2 ml-2"></div>
-                                </div>
-                            `;
-                        }).join('');
-
-                        const funcResultEl = document.createElement('div');
-                        funcResultEl.innerHTML = `
-                            <div class="flex items-center space-x-3 mb-2">
-                                <div class="w-5 h-5 ${func.color}"></div>
-                                <h4 class="font-semibold">${func.name}</h4>
-                            </div>
-                            <div class="pl-8 space-y-1">${techHTML}</div>
-                        `;
-                        assembleResultsContainer.appendChild(funcResultEl);
-                    }
-                });
-            }
-            
-            if (hasResults) {
-                 const headerHTML = `
-                    <div class="flex justify-end text-xs text-gray-500 font-semibold -mb-4 pl-8">
-                        <div class="w-24 text-center">Conviviality</div>
-                        <div class="w-24 text-center">Tech proficiency</div>
-                    </div>
-                `;
-                assembleResultsContainer.insertAdjacentHTML('afterbegin', headerHTML);
-            } else {
+            if (selectedFeatureIds.length === 0) {
                  assembleResultsContainer.innerHTML = `<p class="text-gray-500">Select features on the left to see results.</p>`;
+                 return;
             }
+
+            const rankedTech = dataService.getTechnologies().map(tech => {
+                const aggData = getAggregateData(tech);
+                const matchScore = selectedFeatureIds.reduce((score, sfid) => {
+                    return score + (aggData.features.includes(sfid) ? 1 : 0);
+                }, 0);
+                return { ...tech, matchScore, aggData };
+            }).filter(tech => tech.matchScore > 0);
+
+            rankedTech.sort((a, b) => {
+                if (b.matchScore !== a.matchScore) {
+                    return b.matchScore - a.matchScore;
+                }
+                if ((b.aggData.conviviality || 0) !== (a.aggData.conviviality || 0)) {
+                    return (b.aggData.conviviality || 0) - (a.aggData.conviviality || 0);
+                }
+                return (a.aggData.proficiency || 10) - (b.aggData.proficiency || 10);
+            });
+
+
+            if (rankedTech.length === 0) {
+                 assembleResultsContainer.innerHTML = `<p class="text-gray-500">No technologies match the selected features.</p>`;
+                 return;
+            }
+
+            const headerHTML = `
+                <div class="grid grid-cols-[1fr_auto_auto_auto] gap-4 text-xs text-gray-500 font-semibold mb-2">
+                    <span></span> <!-- Spacer for tech name -->
+                    <span class="w-24 text-center">Match</span>
+                    <span class="w-24 text-center">Conviviality</span>
+                    <span class="w-24 text-center">Tech proficiency</span>
+                </div>
+            `;
+            assembleResultsContainer.innerHTML = headerHTML;
+
+            const relevantFunctionIds = [...new Set(rankedTech.flatMap(t => t.aggData.functionIds))];
+
+            dataService.getFunctions().forEach(func => {
+                const techForFunc = rankedTech.filter(t => t.aggData.functionIds.includes(func.id));
+                if (techForFunc.length > 0) {
+                    const techHTML = techForFunc.map(t => {
+                        const scores = t.aggData;
+                        const convScoreText = scores.conviviality !== null ? scores.conviviality.toFixed(1) : '-';
+                        const techScoreText = scores.proficiency !== null ? scores.proficiency.toFixed(1) : '-';
+                        const matchText = `${t.matchScore}/${selectedFeatureIds.length}`;
+                        return `
+                            <div>
+                                <div class="grid grid-cols-[1fr_auto_auto_auto] gap-4 items-center text-sm py-1">
+                                    <div class="flex items-center tech-name-button" data-tech-id="${t.id}">
+                                        <span class="caret">&#9656;</span>
+                                        <span>${t.name}</span>
+                                    </div>
+                                    <span class="font-semibold w-24 text-center text-blue-600">${matchText}</span>
+                                    <span class="font-semibold w-24 text-center ${getScoreColor(scores.conviviality, 'conviviality')}">${convScoreText}</span>
+                                    <span class="font-semibold w-24 text-center ${getScoreColor(scores.proficiency, 'tech')}">${techScoreText}</span>
+                                </div>
+                                <div id="comments-assemble-${t.id}" class="hidden text-xs text-gray-600 pl-8 py-2 border-l-2 ml-2"></div>
+                            </div>
+                        `;
+                    }).join('');
+
+                    const funcResultEl = document.createElement('div');
+                    funcResultEl.innerHTML = `
+                        <div class="flex items-center space-x-3 mb-2 pt-4">
+                            <div style="background-color: ${func.color}" class="w-5 h-5"></div>
+                            <h4 class="font-semibold">${func.name}</h4>
+                        </div>
+                        <div class="space-y-1">${techHTML}</div>
+                    `;
+                    assembleResultsContainer.appendChild(funcResultEl);
+                }
+            });
         };
 
         const renderEvaluateView = () => {
             renderTechnologyDropdown();
             renderEvaluateFunctionDropdown();
             renderEvaluatePurposes();
+            populateTechProficiencyDropdowns();
+            renderConvivialitySliders();
             featuresWrapper.classList.add('hidden');
             evaluateFeaturesContainer.innerHTML = '';
         };
@@ -552,7 +659,7 @@
             const featuresForFunc = dataService.getFeaturesByFunction(functionId);
             evaluateFeaturesContainer.innerHTML = featuresForFunc.map(feat => `
                 <label class="flex items-center space-x-2 text-sm">
-                    <input type="checkbox" value="${feat.id}" data-feature-id="${feat.id}" class="h-4 w-4 rounded border-gray-300">
+                    <input type="checkbox" value="${feat.id}" class="h-4 w-4 rounded border-gray-300">
                     <span>${feat.name}</span>
                 </label>
             `).join('');
@@ -564,7 +671,7 @@
             dataService.getPurposes().forEach(purpose => {
                 const purposeHTML = `
                     <label class="flex items-center space-x-2 text-sm">
-                        <input type="checkbox" value="${purpose.id}" data-purpose-id="${purpose.id}" class="h-4 w-4 rounded border-gray-300">
+                        <input type="checkbox" value="${purpose.id}" class="h-4 w-4 rounded border-gray-300">
                         <span>${purpose.name}</span>
                     </label>
                 `;
@@ -600,8 +707,6 @@
                         const scores = getAggregateData(t);
                         const convScoreText = scores.conviviality !== null ? scores.conviviality.toFixed(1) : '-';
                         const techScoreText = scores.proficiency !== null ? scores.proficiency.toFixed(1) : '-';
-                        const convivialityColor = getScoreColor(scores.conviviality, 'conviviality');
-                        const techColor = getScoreColor(scores.proficiency, 'tech');
                         return `
                         <div>
                             <div class="flex justify-between items-center text-sm">
@@ -610,8 +715,8 @@
                                     <span>${t.name}</span>
                                 </div>
                                 <div class="flex">
-                                   <span class="font-semibold w-24 text-center ${convivialityColor}">${convScoreText}</span>
-                                   <span class="font-semibold w-24 text-center ${techColor}">${techScoreText}</span>
+                                   <span class="font-semibold w-24 text-center ${getScoreColor(scores.conviviality, 'conviviality')}">${convScoreText}</span>
+                                   <span class="font-semibold w-24 text-center ${getScoreColor(scores.proficiency, 'tech')}">${techScoreText}</span>
                                 </div>
                             </div>
                             <div id="comments-${viewName}-${t.id}" class="hidden text-xs text-gray-600 pl-8 py-2 border-l-2 ml-2"></div>
@@ -626,25 +731,289 @@
                 }
             });
         };
+        
+        const renderAdminDashboard = () => {
+            adminDashboardContainer.innerHTML = `
+                <div class="space-y-8">
+                    <!-- Functions -->
+                    <div>
+                        <h3 class="text-xl font-bold mb-2">Manage Functions</h3>
+                        <table class="admin-table">
+                            <thead><tr><th>Name</th><th>Color</th><th class="w-40">Actions</th></tr></thead>
+                            <tbody id="admin-functions-body"></tbody>
+                        </table>
+                        <form id="add-function-form" class="mt-4 flex space-x-2"><input type="text" placeholder="New function name" class="form-input flex-grow"><button type="submit" class="action-button text-sm !py-2 !px-4">Add</button></form>
+                    </div>
+                    <!-- Features -->
+                    <div>
+                        <h3 class="text-xl font-bold mb-2">Manage Features</h3>
+                        <table class="admin-table">
+                            <thead><tr><th>Name</th><th>Function</th><th>Used By</th><th class="w-40">Actions</th></tr></thead>
+                            <tbody id="admin-features-body"></tbody>
+                        </table>
+                         <form id="add-feature-form" class="mt-4 flex space-x-2"><input type="text" placeholder="New feature name" class="form-input flex-grow"><select id="add-feature-function-select" class="form-input"></select><button type="submit" class="action-button text-sm !py-2 !px-4">Add</button></form>
+                    </div>
+                    <!-- Technologies -->
+                    <div>
+                         <h3 class="text-xl font-bold mb-2">Manage Technologies</h3>
+                        <table class="admin-table">
+                            <thead><tr><th>Name</th><th>Associated Features</th><th class="w-40">Actions</th></tr></thead>
+                            <tbody id="admin-technologies-body"></tbody>
+                        </table>
+                         <form id="add-technology-form" class="mt-4 flex space-x-2"><input type="text" placeholder="New technology name" class="form-input flex-grow"><button type="submit" class="action-button text-sm !py-2 !px-4">Add</button></form>
+                    </div>
+                    <!-- Purposes -->
+                    <div>
+                        <h3 class="text-xl font-bold mb-2">Manage Purposes</h3>
+                        <table class="admin-table">
+                            <thead><tr><th>Name</th><th class="w-40">Actions</th></tr></thead>
+                            <tbody id="admin-purposes-body"></tbody>
+                        </table>
+                        <form id="add-purpose-form" class="mt-4 flex space-x-2"><input type="text" placeholder="New purpose" class="form-input flex-grow"><button type="submit" class="action-button text-sm !py-2 !px-4">Add</button></form>
+                    </div>
+                    <!-- Tech Proficiency -->
+                    <div>
+                        <h3 class="text-xl font-bold mb-2">Manage Tech Proficiency</h3>
+                        <table class="admin-table">
+                            <thead><tr><th>Name</th><th class="w-40">Actions</th></tr></thead>
+                            <tbody id="admin-techproficiency-body"></tbody>
+                        </table>
+                         <form id="add-techproficiency-form" class="mt-4 flex space-x-2"><input type="text" placeholder="New level" class="form-input flex-grow"><button type="submit" class="action-button text-sm !py-2 !px-4">Add</button></form>
+                    </div>
+                    <!-- Conviviality Questions -->
+                    <div>
+                        <h3 class="text-xl font-bold mb-2">Manage Conviviality Questions</h3>
+                        <table class="admin-table">
+                            <thead><tr><th>Question</th><th class="w-40">Actions</th></tr></thead>
+                            <tbody id="admin-conviviality-body"></tbody>
+                        </table>
+                        <form id="add-conviviality-form" class="mt-4 flex space-x-2"><input type="text" placeholder="New question" class="form-input flex-grow"><button type="submit" class="action-button text-sm !py-2 !px-4">Add</button></form>
+                    </div>
+                </div>
+            `;
+            renderAdminTables();
+        };
+
+        const renderAdminTables = () => {
+            // Functions
+            document.getElementById('admin-functions-body').innerHTML = dataService.getFunctions().map(f => `
+                <tr data-id="${f.id}" data-type="function">
+                    <td>
+                        <span class="view-mode">${f.name}</span>
+                        <input type="text" value="${f.name}" class="form-input edit-mode hidden">
+                    </td>
+                    <td>
+                        <span class="view-mode flex items-center"><div style="background-color:${f.color}" class="w-4 h-4 mr-2 border"></div> ${f.color}</span>
+                        <input type="color" value="${f.color}" class="form-input edit-mode hidden">
+                    </td>
+                    <td><button class="text-blue-500 text-xs mr-2" data-action="edit">Edit</button><button class="text-red-500 text-xs" data-action="delete">Delete</button></td>
+                </tr>`).join('');
+
+            // Features
+            const functionOptions = dataService.getFunctions().map(f => `<option value="${f.id}">${f.name}</option>`).join('');
+            document.getElementById('add-feature-function-select').innerHTML = functionOptions;
+            document.getElementById('admin-features-body').innerHTML = dataService.getFeatures().map(f => {
+                const functionName = dataService.getFunctions().find(fn => fn.id === f.functionId)?.name || 'N/A';
+                const techList = dataService.getTechnologies().filter(t => getAggregateData(t).features.includes(f.id));
+                const techListHTML = techList.length > 0 ? `<ul>${techList.map(t => `<li>${t.name}</li>`).join('')}</ul>` : 'None';
+
+                return `
+                <tr data-id="${f.id}" data-type="feature">
+                    <td>
+                        <span class="view-mode">${f.name}</span>
+                        <input type="text" value="${f.name}" class="form-input edit-mode hidden">
+                    </td>
+                    <td>
+                        <span class="view-mode">${functionName}</span>
+                        <select class="form-input edit-mode hidden">${functionOptions.replace(`value="${f.functionId}"`, `value="${f.functionId}" selected`)}</select>
+                    </td>
+                    <td><div class="view-mode">${techListHTML}</div></td>
+                    <td><button class="text-blue-500 text-xs mr-2" data-action="edit">Edit</button><button class="text-red-500 text-xs" data-action="delete">Delete</button></td>
+                </tr>`;
+            }).join('');
+
+            // Technologies
+            document.getElementById('admin-technologies-body').innerHTML = dataService.getTechnologies().map(t => {
+                const aggData = getAggregateData(t);
+                const featureList = `<ul>${aggData.features.map(fid => `<li>${dataService.getFeatureById(fid)?.name || ''}</li>`).join('')}</ul>`;
+                
+                const unassociatedFeatures = dataService.getFeatures().filter(f => !aggData.features.includes(f.id));
+                const addFeatureContainerHTML = unassociatedFeatures.length > 0 ? `
+                    <div class="add-feature-container flex space-x-2 mt-2">
+                        <label class="text-xs text-gray-500 w-full whitespace-nowrap pt-2">Associate a feature:</label>
+                        <select class="form-input flex-grow">${unassociatedFeatures.map(f => `<option value="${f.id}">${f.name}</option>`).join('')}</select>
+                        <button class="text-sm action-button !py-1 !px-2" data-action="add-feature">Add</button>
+                    </div>` : '';
+
+                const editModeFeaturesHTML = `
+                    <div class="edit-mode-features-list space-y-1">
+                        ${aggData.features.map(fid => {
+                            const feature = dataService.getFeatureById(fid);
+                            return feature ? `<div class="edit-mode-item" data-feature-id="${fid}"><span>${feature.name}</span><button class="text-red-500 text-xs" data-action="remove-feature">&times;</button></div>` : '';
+                        }).join('')}
+                    </div>
+                    ${addFeatureContainerHTML}`;
+
+                return `
+                <tr data-id="${t.id}" data-type="technology">
+                    <td>
+                        <span class="view-mode">${t.name}</span>
+                        <input type="text" value="${t.name}" class="form-input edit-mode hidden">
+                    </td>
+                    <td>
+                        <div class="view-mode">${aggData.features.length > 0 ? featureList : 'None'}</div>
+                        <div class="edit-mode hidden">${editModeFeaturesHTML}</div>
+                    </td>
+                    <td><button class="text-blue-500 text-xs mr-2" data-action="edit">Edit</button><button class="text-red-500 text-xs" data-action="delete">Delete</button></td>
+                </tr>`;
+            }).join('');
+
+             // Other Tables
+            document.getElementById('admin-purposes-body').innerHTML = dataService.getPurposes().map(item => `
+                <tr data-id="${item.id}" data-type="purpose"><td><span class="view-mode">${item.name}</span><input type="text" value="${item.name}" class="form-input edit-mode hidden"></td><td><button class="text-blue-500 text-xs mr-2" data-action="edit">Edit</button><button class="text-red-500 text-xs" data-action="delete">Delete</button></td></tr>`).join('');
+            document.getElementById('admin-techproficiency-body').innerHTML = dataService.getTechProficiencyLevels().map(item => `
+                <tr data-id="${item.id}" data-type="techproficiency"><td><span class="view-mode">${item.name}</span><input type="text" value="${item.name}" class="form-input edit-mode hidden"></td><td><button class="text-blue-500 text-xs mr-2" data-action="edit">Edit</button><button class="text-red-500 text-xs" data-action="delete">Delete</button></td></tr>`).join('');
+            document.getElementById('admin-conviviality-body').innerHTML = dataService.getConvivialityQuestions().map(item => `
+                <tr data-id="${item.id}" data-type="conviviality"><td><span class="view-mode">${item.question}</span><input type="text" value="${item.question}" class="form-input edit-mode hidden"></td><td><button class="text-blue-500 text-xs mr-2" data-action="edit">Edit</button><button class="text-red-500 text-xs" data-action="delete">Delete</button></td></tr>`).join('');
+        };
 
         // --- EVENT LISTENERS ---
-        showAssembleButton.addEventListener('click', () => {
-            showEvaluateButton.classList.remove('active');
-            showAssembleButton.classList.add('active');
-            showAppSection('assembleView');
-            renderAssembleView();
-            renderAssembleResults();
+        document.addEventListener('click', (e) => {
+            const navLink = e.target.closest('.nav-link');
+            if (navLink) {
+                e.preventDefault();
+                const pageId = navLink.getAttribute('href').substring(1) + '-page';
+                showPage(pageId);
+            }
+            if (e.target.closest('#home-logo')) {
+                showPage('main-content');
+            }
         });
 
-        showEvaluateButton.addEventListener('click', () => {
-            showAssembleButton.classList.remove('active');
-            showEvaluateButton.classList.add('active');
-            showAppSection('evaluateView');
-            renderEvaluateView();
+        document.getElementById('admin-login-link').addEventListener('click', (e) => {
+            e.preventDefault();
+            showPage('admin-login-page');
+        });
+
+        adminLoginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('admin-email').value;
+            const password = document.getElementById('admin-password').value;
+            const errorEl = document.getElementById('admin-login-error');
+            if (email === 'admin@cos.com' && password === 'password') {
+                errorEl.classList.add('hidden');
+                showPage('admin-dashboard-page');
+            } else {
+                errorEl.classList.remove('hidden');
+            }
         });
         
-        assembleFunctionsContainer.addEventListener('change', () => {
-            const selectedCheckboxes = assembleFunctionsContainer.querySelectorAll('input[type="checkbox"]:checked');
+        adminDashboardContainer.addEventListener('click', (e) => {
+            const target = e.target;
+            const action = target.dataset.action;
+            const row = target.closest('tr');
+            if (!row && !(action === 'add-feature' || action === 'remove-feature')) return;
+
+            const id = row?.dataset.id;
+            const type = row?.dataset.type;
+
+            if (action === 'edit') {
+                row.querySelectorAll('.view-mode').forEach(el => el.classList.add('hidden'));
+                row.querySelectorAll('.edit-mode').forEach(el => el.classList.remove('hidden'));
+                target.textContent = 'Save';
+                target.dataset.action = 'save';
+                // Hide 'add' dropdown if no options
+                if(type === 'technology'){
+                    const select = row.querySelector('.add-feature-container select');
+                    if (select && select.options.length === 0) {
+                        row.querySelector('.add-feature-container').classList.add('hidden');
+                    }
+                }
+            } else if (action === 'save') {
+                if (type === 'function') {
+                    const newName = row.querySelector('input[type="text"]').value;
+                    const newColor = row.querySelector('input[type="color"]').value;
+                    dataService.updateFunction(id, newName, newColor);
+                } else if (type === 'technology') {
+                    const newName = row.querySelector('input[type="text"]').value;
+                    const featureList = row.querySelector('.edit-mode-features-list');
+                    const featureIds = Array.from(featureList.children).map(child => child.dataset.featureId);
+                    dataService.updateTechnology(id, newName, featureIds);
+                } else if (type === 'feature') {
+                     const newName = row.querySelector('input[type="text"]').value;
+                     const newFunctionId = row.querySelector('select').value;
+                     dataService.updateFeature(id, newName, newFunctionId);
+                } else {
+                     const newValue = row.querySelector('input[type="text"]').value;
+                     if (type === 'purpose') dataService.updatePurpose(id, newValue);
+                     if (type === 'techproficiency') dataService.updateTechProficiency(id, newValue);
+                     if (type === 'conviviality') dataService.updateConvivialityQuestion(id, newValue);
+                }
+                renderAdminTables();
+            } else if (action === 'delete') {
+                if (confirm('Are you sure you want to delete this item?')) {
+                    if (type === 'function') dataService.deleteFunction(id);
+                    if (type === 'feature') dataService.deleteFeature(id);
+                    if (type === 'technology') dataService.deleteTechnology(id);
+                    if (type === 'purpose') dataService.deletePurpose(id);
+                    if (type === 'techproficiency') dataService.deleteTechProficiency(id);
+                    if (type === 'conviviality') dataService.deleteConvivialityQuestion(id);
+                    renderAdminTables();
+                }
+            } else if (action === 'add-feature') {
+                const techRow = target.closest('tr');
+                const select = target.previousElementSibling;
+                const featureId = select.value;
+                if (!featureId) return;
+                const feature = dataService.getFeatureById(featureId);
+                const list = techRow.querySelector('.edit-mode-features-list');
+                const newItem = document.createElement('div');
+                newItem.className = 'edit-mode-item';
+                newItem.dataset.featureId = featureId;
+                newItem.innerHTML = `<span>${feature.name}</span><button class="text-red-500 text-xs" data-action="remove-feature">&times;</button>`;
+                list.appendChild(newItem);
+                select.remove(select.selectedIndex);
+                if (select.options.length === 0) {
+                    techRow.querySelector('.add-feature-container').classList.add('hidden');
+                }
+            } else if (action === 'remove-feature') {
+                const techRow = target.closest('tr');
+                const item = target.closest('.edit-mode-item');
+                const featureId = item.dataset.featureId;
+                const feature = dataService.getFeatureById(featureId);
+                const select = techRow.querySelector('.edit-mode select');
+                const newOption = document.createElement('option');
+                newOption.value = featureId;
+                newOption.textContent = feature.name;
+                select.appendChild(newOption);
+                techRow.querySelector('.add-feature-container').classList.remove('hidden');
+                item.remove();
+            }
+        });
+
+        adminDashboardContainer.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const input = form.querySelector('input');
+            const name = input.value.trim();
+            if (!name) return;
+
+            if (form.id === 'add-function-form') dataService.addFunction(name);
+            if (form.id === 'add-feature-form') {
+                const functionId = form.querySelector('select').value;
+                dataService.addFeature(name, functionId);
+            }
+            if (form.id === 'add-technology-form') dataService.addTechnology(name);
+            if (form.id === 'add-purpose-form') dataService.addPurpose(name);
+            if (form.id === 'add-techproficiency-form') dataService.addTechProficiency(name);
+            if (form.id === 'add-conviviality-form') dataService.addConvivialityQuestion(name);
+            
+            input.value = '';
+            renderAdminTables();
+        });
+        
+        assembleFeaturesContainer.addEventListener('change', () => {
+            const selectedCheckboxes = assembleFeaturesContainer.querySelectorAll('input[type="checkbox"]:checked');
             const selectedIds = Array.from(selectedCheckboxes).map(cb => cb.value);
             renderAssembleResults(selectedIds);
         });
@@ -652,8 +1021,7 @@
         newTechnologyInput.addEventListener('keypress', (e) => {
              if (e.key === 'Enter' && newTechnologyInput.value.trim() !== '') {
                 e.preventDefault();
-                const newTechName = newTechnologyInput.value.trim();
-                const newTech = dataService.addTechnology(newTechName);
+                const newTech = dataService.addTechnology(newTechnologyInput.value.trim());
                 renderEvaluateView();
                 evaluateTechSelect.value = newTech.id;
                 newTechnologyInput.value = '';
@@ -668,8 +1036,7 @@
             const selectedFunctionId = evaluateFunctionSelect.value;
             if (e.key === 'Enter' && newFeatureInput.value.trim() !== '' && selectedFunctionId) {
                 e.preventDefault();
-                const newFeatureName = newFeatureInput.value.trim();
-                dataService.addFeature(newFeatureName, selectedFunctionId);
+                dataService.addFeature(newFeatureInput.value.trim(), selectedFunctionId);
                 renderEvaluateFeatures(selectedFunctionId);
                 newFeatureInput.value = '';
             }
@@ -678,8 +1045,7 @@
         newPurposeInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && newPurposeInput.value.trim() !== '') {
                 e.preventDefault();
-                const newPurposeName = newPurposeInput.value.trim();
-                dataService.addPurpose(newPurposeName);
+                dataService.addPurpose(newPurposeInput.value.trim());
                 renderEvaluatePurposes();
                 newPurposeInput.value = '';
             }
@@ -691,10 +1057,9 @@
                 alert('Please select a technology to evaluate.');
                 return;
             }
-            
             const technology = dataService.getTechnologyById(techId);
             
-            const convSliders = convivialityQuestions.querySelectorAll('input[type="range"]');
+            const convSliders = convivialitySlidersContainer.querySelectorAll('input[type="range"]');
             const totalConvScore = Array.from(convSliders).reduce((sum, slider) => sum + parseInt(slider.value), 0);
             const avgConvScore = totalConvScore / convSliders.length;
 
@@ -707,19 +1072,15 @@
             };
             
             dataService.addEvaluation(techId, newEvaluation);
-            dataService.incrementVersion();
-            updateVersionTracker();
             
             saveConfirmationMessage.textContent = `Your evaluation of ${technology.name} has been saved.`;
             saveConfirmationMessage.classList.remove('hidden');
-            setTimeout(() => {
-                saveConfirmationMessage.classList.add('hidden');
-            }, 3000);
+setTimeout(() => saveConfirmationMessage.classList.add('hidden'), 3000);
 
             // Clear form
-            evaluateTechSelect.value = '';
-            evaluateFunctionSelect.value = '';
-            evaluationComment.value = '';
+            const form = document.getElementById('evaluate-form-container');
+            form.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
+            form.querySelectorAll('textarea').forEach(t => t.value = '');
             renderEvaluateFeatures(null);
             renderEvaluatePurposes();
         });
@@ -751,7 +1112,7 @@
                      }
 
                      let commentsHTML = '<p class="font-semibold mt-2">Comments:</p>';
-                     const comments = technology.evaluations.filter(ev => ev.comment.trim() !== '');
+                     const comments = technology.evaluations.filter(ev => ev.comment && ev.comment.trim() !== '' && !ev.isAdminAssigned);
                      if (comments.length > 0) {
                         commentsHTML += comments.map(ev => `<p class="border-t pt-2 mt-2">"${ev.comment}"</p>`).join('');
                      } else {
@@ -763,31 +1124,20 @@
             }
         };
 
-        assembleResultsContainer.addEventListener('click', handleCommentToggle);
-        allTechListContainer.addEventListener('click', handleCommentToggle);
-
-        navLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const pageId = e.target.getAttribute('href').substring(1) + '-page';
-                if (pageId === 'all-tech-page') {
-                    renderAllTechnologiesList(allTechListContainer, 'all_tech');
-                }
-                showPage(pageId);
-            });
-        });
-
-        homeLogo.addEventListener('click', () => showPage('main-content'));
-
-        // --- INITIALIZATION ---
-        populateTechProficiencyDropdowns();
-        updateVersionTracker();
-        showPage('main-content');
-        
-        // Set data-view attributes for event delegation
         assembleResultsContainer.dataset.view = 'assemble';
         allTechListContainer.dataset.view = 'all_tech';
+        assembleResultsContainer.addEventListener('click', handleCommentToggle);
+        allTechListContainer.addEventListener('click', handleCommentToggle);
+        
+        // --- ROUTING & INITIALIZATION ---
+        const handleRouting = () => {
+            const hash = window.location.hash || '#';
+            const pageId = hash.substring(1) ? hash.substring(1) + '-page' : 'main-content';
+            showPage(pageId);
+        };
 
+        window.addEventListener('hashchange', handleRouting);
+        handleRouting(); // Initial page load
     });
     </script>
 </body>
