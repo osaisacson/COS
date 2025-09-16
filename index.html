@@ -48,7 +48,7 @@
                 <span class="bg-yellow-400"></span><span class="bg-purple-400"></span>
             </div>
             <nav class="flex space-x-6 text-sm font-medium text-gray-600">
-                <a href="#all_tech" class="nav-link hover:text-black">All technologies</a>
+                <a href="#technologies" class="nav-link hover:text-black">Technologies</a>
                 <a href="#functions" class="nav-link hover:text-black">Supported functions</a>
                 <a href="#why" class="nav-link hover:text-black">Why is this needed</a>
                 <a href="#about" class="nav-link hover:text-black">About</a>
@@ -61,7 +61,7 @@
                 <div class="grid md:grid-cols-2 gap-12 pt-12 pb-16">
                     <div>
                         <h1 class="text-6xl font-bold leading-tight">Convivial<br>Operating<br>System</h1>
-                        <p class="mt-4 text-2xl">An evolving toolbox of technologies that work for you, not the other way around.</p>
+                        <p class="mt-4 text-2xl">An evolving toolbox of technologies used by countercultures</p>
                     </div>
                     <div class="flex items-center">
                         <div class="w-full space-y-2 text-sm">
@@ -73,19 +73,15 @@
                         </div>
                     </div>
                 </div>
-                <div class="text-gray-600 space-y-4 text-sm">
-                    <p>Have an idea of how we can explore alternatives to the dominant way of living?</p>
-                    <p>The COS intends to give you tools for working together with others to make that idea a reality. Not by 'one size fits all' or digitalising away human values, but by sharing a method for selecting which technologies could support your group.</p>
-                    <p>The original toolbox from which to choose is constructed from research on which technologies countercultures have found useful in supporting their purpose. This toolbox is not intended to be static, but to be continuously updated in relation to what has actually been useful - and, importantly, which technologies to avoid.</p>
+                <div class="text-gray-600 space-y-4 text-sm border-t pt-12 mt-12">
+                     <p>The COS is a method for guiding post-growth organisations towards technologies that support their operation - making aspects such as managing a shared economy, communicate with dispersed members or sharing a commons easier.</p>
+                     <p>The intention is to facilitate the emergence, functioning and flourishing of groups exploring alternative futures to the present, and strengthen their impact.</p>
+                     <div class="flex space-x-4 items-center pt-8">
+                        <a href="#assemble" class="action-button nav-link">Assemble your COS</a>
+                        <a href="#evaluate" class="action-button nav-link">Evaluate technologies</a>
+                        <span id="version-tracker" class="text-xs text-gray-500"></span>
+                     </div>
                 </div>
-            </section>
-
-            <!-- Main Actions -->
-            <section id="main-actions-section" class="border-t pt-12 mt-12">
-                 <div class="flex space-x-4 items-center">
-                    <a href="#assemble" class="action-button nav-link">Assemble your COS</a>
-                    <a href="#evaluate" class="action-button nav-link">Evaluate technologies</a>
-                 </div>
             </section>
         </main>
 
@@ -121,16 +117,12 @@
                         <select id="evaluate-tech-proficiency" class="form-input w-full mt-1"></select>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium">Filter features by function</label>
-                        <select id="evaluate-function-select" class="form-input w-full mt-1"></select>
-                    </div>
-                    <div id="features-wrapper" class="hidden">
-                        <label class="block text-sm font-medium">What features does it have? Aka, how is it useful in supporting your purpose?</label>
-                        <div id="evaluate-features-container" class="mt-1 p-2 border border-gray-300 rounded-md max-h-32 overflow-y-auto"></div>
-                         <input type="text" id="new-feature-input" class="form-input w-full mt-2 text-sm" placeholder="Add a new feature...">
+                        <label class="block text-sm font-medium">What does it help out with?</label>
+                        <input type="search" id="evaluate-features-search" class="form-input w-full mt-1 text-sm" placeholder="Search for features...">
+                        <div id="evaluate-features-container" class="mt-2 p-2 border border-gray-300 rounded-md max-h-40 overflow-y-auto"></div>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium">Which purposes does it support?</label>
+                        <label class="block text-sm font-medium">Which ends does it support?</label>
                         <div id="evaluate-purposes-container" class="mt-1 p-2 border border-gray-300 rounded-md max-h-32 overflow-y-auto"></div>
                         <input type="text" id="new-purpose-input" class="form-input w-full mt-2 text-sm" placeholder="Add a new purpose...">
                     </div>
@@ -151,9 +143,9 @@
             </div>
         </section>
 
-        <section id="all-tech-page" class="page-content pt-12">
-             <h1 class="text-4xl font-bold mb-8">All Technologies</h1>
-             <div id="all-tech-list-container" class="space-y-8"></div>
+        <section id="technologies-page" class="page-content pt-12">
+             <h1 class="text-4xl font-bold mb-8">Technologies</h1>
+             <div id="technologies-list-container" class="space-y-8"></div>
         </section>
 
         <section id="functions-page" class="page-content pt-12">
@@ -239,6 +231,7 @@
     document.addEventListener('DOMContentLoaded', () => {
         // --- DATA ---
         const appData = {
+            version: 1.0,
             functions: [
                 { id: 'comm', name: 'Communication', color: '#facc15', accent: 'accent-yellow-400' },
                 { id: 'econ', name: 'Economy', color: '#f472b6', accent: 'accent-pink-400' },
@@ -301,6 +294,8 @@
         };
 
         const dataService = {
+            getVersion: () => appData.version,
+            incrementVersion: () => { appData.version = parseFloat((appData.version + 0.1).toFixed(1)); },
             // GETTERS
             getFunctions: () => appData.functions,
             getFeatures: () => appData.features,
@@ -350,7 +345,6 @@
                 if (func) {
                     func.name = newName;
                     func.color = newColor;
-                    // Note: accent color is not updated, as it's tied to tailwind classes
                 }
             },
             updateFeature: (id, newName, newFunctionId) => {
@@ -364,7 +358,6 @@
                 const tech = appData.technologies.find(t => t.id == id);
                 if (tech) {
                     tech.name = newName;
-                    // This logic finds or creates a special "admin" evaluation to hold the canonical feature list
                     let adminEval = tech.evaluations.find(ev => ev.isAdminAssigned);
                     if (adminEval) {
                         adminEval.features = featureIds;
@@ -418,17 +411,14 @@
         // --- ELEMENTS ---
         const pageContents = document.querySelectorAll('.page-content');
         const homeLogo = document.getElementById('home-logo');
-        const allTechListContainer = document.getElementById('all-tech-list-container');
+        const technologiesListContainer = document.getElementById('technologies-list-container');
         const assembleFeaturesContainer = document.getElementById('assemble-features-container');
         const assembleResultsContainer = document.getElementById('assemble-results-container');
         const evaluateTechSelect = document.getElementById('evaluate-tech-select');
         const newTechnologyInput = document.getElementById('new-technology-input');
         const evaluateTechProficiency = document.getElementById('evaluate-tech-proficiency');
-        const evaluateFunctionSelect = document.getElementById('evaluate-function-select');
-        const featuresWrapper = document.getElementById('features-wrapper');
+        const evaluateFeaturesSearch = document.getElementById('evaluate-features-search');
         const evaluateFeaturesContainer = document.getElementById('evaluate-features-container');
-        const newFeatureInput = document.getElementById('new-feature-input');
-        const evaluatePurposesContainer = document.getElementById('evaluate-purposes-container');
         const newPurposeInput = document.getElementById('new-purpose-input');
         const saveEvaluationButton = document.getElementById('save-evaluation-button');
         const evaluationComment = document.getElementById('evaluation-comment');
@@ -436,6 +426,7 @@
         const saveConfirmationMessage = document.getElementById('save-confirmation-message');
         const adminLoginForm = document.getElementById('admin-login-form');
         const adminDashboardContainer = document.getElementById('admin-dashboard-container');
+        const versionTracker = document.getElementById('version-tracker');
 
         // --- HELPERS ---
         const getAggregateData = (technology) => {
@@ -483,7 +474,6 @@
             pageContents.forEach(page => {
                 if (page.id === pageId) {
                     page.classList.add('active');
-                    // Run page-specific render functions
                     if(page.id === 'assemble-page') {
                         renderAssembleView();
                         renderAssembleResults();
@@ -491,8 +481,8 @@
                     if(page.id === 'evaluate-page') {
                         renderEvaluateView();
                     }
-                    if(page.id === 'all-tech-page') {
-                        renderAllTechnologiesList(allTechListContainer, 'all_tech');
+                    if(page.id === 'technologies-page') {
+                        renderTechnologiesList(technologiesListContainer, 'technologies');
                     }
                     if(page.id === 'admin-dashboard-page') {
                         renderAdminDashboard();
@@ -504,6 +494,10 @@
         };
         
         // --- RENDER FUNCTIONS ---
+        const updateVersionTracker = () => {
+            versionTracker.textContent = `Version ${dataService.getVersion().toFixed(1)}`;
+        };
+
         const populateTechProficiencyDropdowns = () => {
             const dropdown = document.getElementById('evaluate-tech-proficiency');
             if(!dropdown) return;
@@ -571,11 +565,13 @@
             }
 
             const headerHTML = `
-                <div class="grid grid-cols-[1fr_auto_auto_auto] gap-4 text-xs text-gray-500 font-semibold mb-2">
+                <div class="grid grid-cols-[1fr_auto] gap-4 text-xs text-gray-500 font-semibold mb-2">
                     <span></span> <!-- Spacer for tech name -->
-                    <span class="w-24 text-center">Match</span>
-                    <span class="w-24 text-center">Conviviality</span>
-                    <span class="w-24 text-center">Tech proficiency</span>
+                    <div class="grid grid-cols-3 gap-4">
+                        <span class="w-24 text-center">Match</span>
+                        <span class="w-24 text-center">Conviviality</span>
+                        <span class="w-24 text-center">Tech proficiency</span>
+                    </div>
                 </div>
             `;
             assembleResultsContainer.innerHTML = headerHTML;
@@ -592,16 +588,18 @@
                         const matchText = `${t.matchScore}/${selectedFeatureIds.length}`;
                         return `
                             <div>
-                                <div class="grid grid-cols-[1fr_auto_auto_auto] gap-4 items-center text-sm py-1">
+                                <div class="grid grid-cols-[1fr_auto] gap-4 items-center text-sm py-1">
                                     <div class="flex items-center tech-name-button" data-tech-id="${t.id}">
                                         <span class="caret">&#9656;</span>
                                         <span>${t.name}</span>
                                     </div>
-                                    <span class="font-semibold w-24 text-center text-blue-600">${matchText}</span>
-                                    <span class="font-semibold w-24 text-center ${getScoreColor(scores.conviviality, 'conviviality')}">${convScoreText}</span>
-                                    <span class="font-semibold w-24 text-center ${getScoreColor(scores.proficiency, 'tech')}">${techScoreText}</span>
+                                    <div class="grid grid-cols-3 gap-4">
+                                        <span class="font-semibold w-24 text-center text-blue-600">${matchText}</span>
+                                        <span class="font-semibold w-24 text-center ${getScoreColor(scores.conviviality, 'conviviality')}">${convScoreText}</span>
+                                        <span class="font-semibold w-24 text-center ${getScoreColor(scores.proficiency, 'tech')}">${techScoreText}</span>
+                                    </div>
                                 </div>
-                                <div id="comments-assemble-${t.id}" class="hidden text-xs text-gray-600 pl-8 py-2 border-l-2 ml-2"></div>
+                                <div id="comments-assemble-${t.id}" class="hidden text-xs text-gray-600 pl-4 py-2"></div>
                             </div>
                         `;
                     }).join('');
@@ -621,12 +619,10 @@
 
         const renderEvaluateView = () => {
             renderTechnologyDropdown();
-            renderEvaluateFunctionDropdown();
+            renderEvaluateFeatures();
             renderEvaluatePurposes();
             populateTechProficiencyDropdowns();
             renderConvivialitySliders();
-            featuresWrapper.classList.add('hidden');
-            evaluateFeaturesContainer.innerHTML = '';
         };
 
         const renderTechnologyDropdown = () => {
@@ -639,35 +635,21 @@
             });
         };
         
-        const renderEvaluateFunctionDropdown = () => {
-            evaluateFunctionSelect.innerHTML = '<option value="">Select a function</option>';
-            dataService.getFunctions().forEach(func => {
-                const option = document.createElement('option');
-                option.value = func.id;
-                option.textContent = func.name;
-                evaluateFunctionSelect.appendChild(option);
-            });
-        };
-        
-        const renderEvaluateFeatures = (functionId) => {
-            if (!functionId) {
-                featuresWrapper.classList.add('hidden');
-                evaluateFeaturesContainer.innerHTML = '';
-                return;
-            }
-            
-            const featuresForFunc = dataService.getFeaturesByFunction(functionId);
-            evaluateFeaturesContainer.innerHTML = featuresForFunc.map(feat => `
-                <label class="flex items-center space-x-2 text-sm">
+        const renderEvaluateFeatures = (searchTerm = '') => {
+            const lowerCaseSearchTerm = searchTerm.toLowerCase();
+            const allFeatures = dataService.getFeatures();
+            evaluateFeaturesContainer.innerHTML = allFeatures
+                .filter(feat => feat.name.toLowerCase().includes(lowerCaseSearchTerm))
+                .map(feat => `
+                <label class="flex items-center space-x-2 text-sm p-1">
                     <input type="checkbox" value="${feat.id}" class="h-4 w-4 rounded border-gray-300">
                     <span>${feat.name}</span>
                 </label>
             `).join('');
-            featuresWrapper.classList.remove('hidden');
         };
         
         const renderEvaluatePurposes = () => {
-            evaluatePurposesContainer.innerHTML = '';
+            document.getElementById('evaluate-purposes-container').innerHTML = '';
             dataService.getPurposes().forEach(purpose => {
                 const purposeHTML = `
                     <label class="flex items-center space-x-2 text-sm">
@@ -675,20 +657,23 @@
                         <span>${purpose.name}</span>
                     </label>
                 `;
-                evaluatePurposesContainer.innerHTML += purposeHTML;
+                document.getElementById('evaluate-purposes-container').innerHTML += purposeHTML;
             });
         };
 
-        const renderAllTechnologiesList = (container, viewName) => {
+        const renderTechnologiesList = (container, viewName) => {
             container.innerHTML = '';
             
             const headerHTML = `
-                <div class="flex justify-end text-xs text-gray-500 font-semibold">
-                    <div class="w-24 text-center">Conviviality</div>
-                    <div class="w-24 text-center">Tech proficiency</div>
+                 <div class="grid grid-cols-[1fr_auto] gap-4 text-xs text-gray-500 font-semibold mb-2">
+                    <span></span> <!-- Spacer for tech name -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <span class="w-24 text-center">Conviviality</span>
+                        <span class="w-24 text-center">Tech proficiency</span>
+                    </div>
                 </div>
             `;
-            container.insertAdjacentHTML('beforeend', headerHTML);
+            container.innerHTML = headerHTML;
 
             dataService.getFunctions().forEach(func => {
                 let techForFunc = dataService.getTechnologies().filter(t => getAggregateData(t).functionIds.includes(func.id));
@@ -709,23 +694,26 @@
                         const techScoreText = scores.proficiency !== null ? scores.proficiency.toFixed(1) : '-';
                         return `
                         <div>
-                            <div class="flex justify-between items-center text-sm">
+                            <div class="grid grid-cols-[1fr_auto] gap-4 items-center text-sm py-1">
                                 <div class="flex items-center tech-name-button" data-tech-id="${t.id}">
                                     <span class="caret">&#9656;</span>
                                     <span>${t.name}</span>
                                 </div>
-                                <div class="flex">
+                                <div class="grid grid-cols-2 gap-4">
                                    <span class="font-semibold w-24 text-center ${getScoreColor(scores.conviviality, 'conviviality')}">${convScoreText}</span>
                                    <span class="font-semibold w-24 text-center ${getScoreColor(scores.proficiency, 'tech')}">${techScoreText}</span>
                                 </div>
                             </div>
-                            <div id="comments-${viewName}-${t.id}" class="hidden text-xs text-gray-600 pl-8 py-2 border-l-2 ml-2"></div>
+                            <div id="comments-${viewName}-${t.id}" class="hidden text-xs text-gray-600 pl-4 py-2"></div>
                         </div>
                     `}).join('');
                     const funcResultEl = document.createElement('div');
                     funcResultEl.innerHTML = `
-                        <h4 class="font-semibold mb-2">${func.name}</h4>
-                        <div class="pl-4 space-y-1 border-l-2">${techHTML}</div>
+                        <div class="flex items-center space-x-3 mb-2 pt-4">
+                            <div style="background-color: ${func.color}" class="w-5 h-5"></div>
+                            <h4 class="font-semibold">${func.name}</h4>
+                        </div>
+                        <div class="space-y-1">${techHTML}</div>
                     `;
                     container.appendChild(funcResultEl);
                 }
@@ -1028,18 +1016,8 @@
             }
         });
         
-        evaluateFunctionSelect.addEventListener('change', (e) => {
+        evaluateFeaturesSearch.addEventListener('keyup', (e) => {
             renderEvaluateFeatures(e.target.value);
-        });
-        
-        newFeatureInput.addEventListener('keypress', (e) => {
-            const selectedFunctionId = evaluateFunctionSelect.value;
-            if (e.key === 'Enter' && newFeatureInput.value.trim() !== '' && selectedFunctionId) {
-                e.preventDefault();
-                dataService.addFeature(newFeatureInput.value.trim(), selectedFunctionId);
-                renderEvaluateFeatures(selectedFunctionId);
-                newFeatureInput.value = '';
-            }
         });
         
         newPurposeInput.addEventListener('keypress', (e) => {
@@ -1067,11 +1045,13 @@
                 techProficiency: parseInt(evaluateTechProficiency.value),
                 convivialityScore: avgConvScore,
                 comment: evaluationComment.value,
-                features: Array.from(evaluateFeaturesContainer.querySelectorAll('input:checked')).map(cb => cb.value),
-                purposes: Array.from(evaluatePurposesContainer.querySelectorAll('input:checked')).map(cb => cb.value),
+                features: Array.from(document.getElementById('evaluate-features-container').querySelectorAll('input:checked')).map(cb => cb.value),
+                purposes: Array.from(document.getElementById('evaluate-purposes-container').querySelectorAll('input:checked')).map(cb => cb.value),
             };
             
             dataService.addEvaluation(techId, newEvaluation);
+            dataService.incrementVersion();
+            updateVersionTracker();
             
             saveConfirmationMessage.textContent = `Your evaluation of ${technology.name} has been saved.`;
             saveConfirmationMessage.classList.remove('hidden');
@@ -1080,8 +1060,8 @@ setTimeout(() => saveConfirmationMessage.classList.add('hidden'), 3000);
             // Clear form
             const form = document.getElementById('evaluate-form-container');
             form.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
-            form.querySelectorAll('textarea').forEach(t => t.value = '');
-            renderEvaluateFeatures(null);
+            form.querySelectorAll('textarea, input[type="search"]').forEach(t => t.value = '');
+            renderEvaluateFeatures();
             renderEvaluatePurposes();
         });
         
@@ -1125,9 +1105,9 @@ setTimeout(() => saveConfirmationMessage.classList.add('hidden'), 3000);
         };
 
         assembleResultsContainer.dataset.view = 'assemble';
-        allTechListContainer.dataset.view = 'all_tech';
+        technologiesListContainer.dataset.view = 'technologies';
         assembleResultsContainer.addEventListener('click', handleCommentToggle);
-        allTechListContainer.addEventListener('click', handleCommentToggle);
+        technologiesListContainer.addEventListener('click', handleCommentToggle);
         
         // --- ROUTING & INITIALIZATION ---
         const handleRouting = () => {
@@ -1138,6 +1118,7 @@ setTimeout(() => saveConfirmationMessage.classList.add('hidden'), 3000);
 
         window.addEventListener('hashchange', handleRouting);
         handleRouting(); // Initial page load
+        updateVersionTracker();
     });
     </script>
 </body>
