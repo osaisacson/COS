@@ -238,6 +238,10 @@
             opacity: 1;
             transform: translateY(-2px);
             box-shadow: 4px 4px 0px 0px #000;
+            /* New hover color logic uses CSS var set in inline style */
+            background-color: var(--func-color); 
+            color: white;
+            border-color: var(--func-color);
         }
         .function-tab.active {
             opacity: 1;
@@ -245,6 +249,10 @@
             color: white;
             box-shadow: 4px 4px 0px 0px #000;
         }
+        
+        /* Sortable Columns */
+        .sort-btn { cursor: pointer; user-select: none; }
+        .sort-btn:hover { text-decoration: underline; }
         
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(5px); }
@@ -319,8 +327,6 @@
                             <div id="assemble-size-display" class="slider-value-display">Smallish Group (6-15)</div>
                         </div>
                         
-                        <!-- Moved FLOSS filter to right side -->
-
                         <div class="mt-8">
                             <!-- Updated Header: Simple Text -->
                             <h3 class="text-xl font-bold font-['Space_Grotesk'] uppercase mb-4 mt-8">What do you need to do?</h3>
@@ -411,8 +417,8 @@
                          <div id="conviviality-sliders-container" class="space-y-6"></div>
                     </div>
                     
-                    <div class="pt-4 border-t-4 border-black">
-                        <label class="block text-sm font-bold font-['Space_Mono'] uppercase mb-2 mt-4">Comments</label>
+                    <div class="pt-4 mt-6"> <!-- Removed border top here -->
+                        <label class="block text-sm font-bold font-['Space_Mono'] uppercase mb-2">Comments</label>
                         <textarea id="evaluation-comment" class="form-input" rows="3" placeholder="Your review..."></textarea>
                     </div>
 
@@ -627,6 +633,10 @@
 
         let currentEvalFeatureIds = new Set();
         let currentEvalActiveFunctionId = null;
+        
+        // Sorting State for Technologies Page
+        let techSort = { field: null, dir: 'desc' }; // field: 'conviviality' | 'tech'
+        let techFilterOpenSource = false;
 
         const dataService = {
             getVersion: () => appData.version,
@@ -1084,7 +1094,7 @@
         // --- NEW EVALUATION LOGIC ---
         const renderFunctionSelector = () => {
             evaluateFunctionTabs.innerHTML = dataService.getFunctions().map(f => `
-                <div class="function-tab" data-func-id="${f.id}" style="border-color:${f.color}">
+                <div class="function-tab" data-func-id="${f.id}" style="--func-color:${f.color}; border-color:var(--func-color)">
                     ${f.name}
                 </div>
             `).join('');
@@ -1171,61 +1181,120 @@
         const renderTechnologiesList = (container, viewName) => {
             container.innerHTML = '';
             
+            // Header with Filters and Sort
             const headerHTML = `
-                 <div class="grid grid-cols-[1fr_auto] gap-4 text-xs font-bold uppercase tracking-wider mb-4 border-b-2 border-black pb-2 font-['Space_Mono']">
-                    <span>Technology</span>
-                    <div class="grid grid-cols-2 gap-6">
-                        <span class="w-16 text-center">Conviv.</span>
-                        <span class="w-16 text-center">Tech Lvl</span>
+                 <div class="mb-4 border-b-2 border-black pb-2">
+                    <div class="flex justify-between items-end mb-4">
+                        <span class="font-bold text-lg uppercase font-['Space_Grotesk']">Technology</span>
+                        <span class="font-bold text-sm uppercase font-['Space_Mono'] mr-8">Score</span>
+                    </div>
+                    <div class="flex justify-between items-end">
+                         <!-- Filter -->
+                         <label class="flex items-center space-x-2 cursor-pointer pb-2">
+                            <input type="checkbox" id="tech-floss-filter" class="feature-checkbox" ${techFilterOpenSource ? 'checked' : ''}>
+                            <span class="font-bold font-['Space_Mono'] text-xs uppercase">Strictly Open Source</span>
+                         </label>
+
+                         <!-- Sort Headers -->
+                         <div class="grid grid-cols-2 gap-6 text-xs font-bold uppercase font-['Space_Mono']">
+                            <button id="sort-conviviality" class="sort-btn w-20 text-center">Conviviality <span id="sort-icon-conv">${techSort.field === 'conviviality' ? (techSort.dir === 'asc' ? '▲' : '▼') : ''}</span></button>
+                            <button id="sort-tech" class="sort-btn w-20 text-center">Tech Lvl <span id="sort-icon-tech">${techSort.field === 'tech' ? (techSort.dir === 'asc' ? '▲' : '▼') : ''}</span></button>
+                         </div>
                     </div>
                 </div>
             `;
             container.innerHTML = headerHTML;
+            
+            // Filter
+            let techList = dataService.getTechnologies();
+            if (techFilterOpenSource) {
+                techList = techList.filter(t => t.isOpenSource);
+            }
 
-            dataService.getFunctions().forEach(func => {
-                let techForFunc = dataService.getTechnologies().filter(t => getAggregateData(t).functionIds.includes(func.id));
-                
-                techForFunc.sort((a, b) => {
+            // Sort
+            if (techSort.field) {
+                techList.sort((a, b) => {
                     const scoreA = getAggregateData(a);
                     const scoreB = getAggregateData(b);
-                    if ((scoreB.conviviality || 0) !== (scoreA.conviviality || 0)) {
-                        return (scoreB.conviviality || 0) - (scoreA.conviviality || 0);
-                    }
-                    return (scoreA.proficiency || 10) - (scoreB.proficiency || 10);
-                });
-
-                if (techForFunc.length > 0) {
-                    const techHTML = techForFunc.map(t => {
-                        const scores = getAggregateData(t);
-                        const convScoreText = scores.conviviality !== null ? scores.conviviality.toFixed(1) : '-';
-                        const techScoreText = scores.proficiency !== null ? scores.proficiency.toFixed(1) : '-';
-                        return `
-                        <div class="neo-card mb-4 overflow-hidden">
-                            <div class="grid grid-cols-[1fr_auto] gap-4 items-center text-sm p-4 hover:bg-gray-50 transition-colors">
-                                <div class="flex items-center tech-name-button font-bold text-lg font-['Space_Grotesk']" data-tech-id="${t.id}">
-                                    <span class="caret text-black mr-2">▶</span>
-                                    <span>${t.name}</span>
-                                    ${t.isOpenSource ? '<span class="ml-2 tag bg-green-200 border-black" title="Open Source">FLOSS</span>' : ''}
-                                </div>
-                                <div class="grid grid-cols-2 gap-6 font-['Space_Mono']">
-                                   <span class="font-bold w-16 text-center py-1 border-2 border-black bg-white">${convScoreText}</span>
-                                   <span class="font-bold w-16 text-center py-1 border-2 border-black bg-white">${techScoreText}</span>
-                                </div>
-                            </div>
-                            <div id="comments-${viewName}-${t.id}" class="hidden text-sm bg-gray-50 border-t-2 border-black p-4 font-['Space_Mono']"></div>
-                        </div>
-                    `}).join('');
                     
-                    const funcResultEl = document.createElement('div');
-                    funcResultEl.innerHTML = `
-                        <div class="flex items-center space-x-3 mb-4 mt-8 pb-2 border-b-4" style="border-color: ${func.color}">
-                            <div style="background-color: ${func.color}" class="w-4 h-4 border-2 border-black"></div>
-                            <h4 class="font-bold text-black text-lg uppercase tracking-wide font-['Space_Grotesk']">${func.name}</h4>
+                    let valA, valB;
+                    if (techSort.field === 'conviviality') {
+                        valA = scoreA.conviviality || 0;
+                        valB = scoreB.conviviality || 0;
+                    } else { // tech
+                        valA = scoreA.proficiency || 0;
+                        valB = scoreB.proficiency || 0;
+                    }
+                    
+                    if (techSort.dir === 'asc') return valA - valB;
+                    else return valB - valA;
+                });
+            } else {
+                 // Default sort by name or grouped logic? Leaving as data order or basic name sort
+                 techList.sort((a,b) => a.name.localeCompare(b.name));
+            }
+
+
+            if (techList.length > 0) {
+                const techHTML = techList.map(t => {
+                    const scores = getAggregateData(t);
+                    const convScoreText = scores.conviviality !== null ? scores.conviviality.toFixed(1) : '-';
+                    const techScoreText = scores.proficiency !== null ? scores.proficiency.toFixed(1) : '-';
+                    
+                    // Determine which function color to use for the side border
+                    // If multiple, maybe just use first or gray? Let's use the first one.
+                    let borderColor = 'black';
+                    if (scores.functionIds && scores.functionIds.length > 0) {
+                        const func = dataService.getFunctions().find(f => f.id === scores.functionIds[0]);
+                        if(func) borderColor = func.color;
+                    }
+
+                    return `
+                    <div class="neo-card mb-4 overflow-hidden" style="border-left: 6px solid ${borderColor}">
+                        <div class="grid grid-cols-[1fr_auto] gap-4 items-center text-sm p-4 hover:bg-gray-50 transition-colors">
+                            <div class="flex items-center tech-name-button font-bold text-lg font-['Space_Grotesk']" data-tech-id="${t.id}">
+                                <span class="caret text-black mr-2">▶</span>
+                                <span>${t.name}</span>
+                                ${t.isOpenSource ? '<span class="ml-2 tag bg-green-200 border-black" title="Open Source">FLOSS</span>' : ''}
+                            </div>
+                            <div class="grid grid-cols-2 gap-6 font-['Space_Mono']">
+                               <span class="font-bold w-20 text-center py-1 border-2 border-black bg-white">${convScoreText}</span>
+                               <span class="font-bold w-20 text-center py-1 border-2 border-black bg-white">${techScoreText}</span>
+                            </div>
                         </div>
-                        <div class="space-y-4">${techHTML}</div>
-                    `;
-                    container.appendChild(funcResultEl);
+                        <div id="comments-${viewName}-${t.id}" class="hidden text-sm bg-gray-50 border-t-2 border-black p-4 font-['Space_Mono']"></div>
+                    </div>
+                `}).join('');
+                
+                container.innerHTML += `<div class="space-y-4 mt-4">${techHTML}</div>`;
+            } else {
+                container.innerHTML += `<div class="text-center py-8 italic text-gray-500">No technologies found matching criteria.</div>`;
+            }
+
+            // Attach listeners
+            document.getElementById('tech-floss-filter').addEventListener('change', (e) => {
+                techFilterOpenSource = e.target.checked;
+                renderTechnologiesList(container, viewName);
+            });
+            
+            document.getElementById('sort-conviviality').addEventListener('click', () => {
+                if (techSort.field === 'conviviality') {
+                    techSort.dir = techSort.dir === 'asc' ? 'desc' : 'asc';
+                } else {
+                    techSort.field = 'conviviality';
+                    techSort.dir = 'desc';
                 }
+                renderTechnologiesList(container, viewName);
+            });
+            
+            document.getElementById('sort-tech').addEventListener('click', () => {
+                if (techSort.field === 'tech') {
+                    techSort.dir = techSort.dir === 'asc' ? 'desc' : 'asc';
+                } else {
+                    techSort.field = 'tech';
+                    techSort.dir = 'asc'; // tech level usually implies lower is better/easier? or higher? let's default asc
+                }
+                renderTechnologiesList(container, viewName);
             });
         };
         
