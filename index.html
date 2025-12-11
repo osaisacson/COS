@@ -6,70 +6,234 @@
     <title>Convivial Operating Stack</title>
     <script src="https://cdn.tailwindcss.com"></script>
     
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
     <style>
-        body { background-color: #fff; font-family: 'Inter', sans-serif; }
-        .form-input { border: 1px solid #d1d5db; border-radius: 0.25rem; padding: 0.5rem 0.75rem; width: 100%; }
-        .form-input:focus { outline: 2px solid #a78bfa; border-color: transparent; }
-        .action-button { background-color: #374151; color: white; font-weight: 600; padding: 0.75rem 1.5rem; border-radius: 0.25rem; transition: all 0.2s; display: inline-block; text-align: center; cursor: pointer; }
-        .action-button:hover { background-color: #111827; transform: translateY(-1px); }
-        .action-button.active { background-color: #000; }
-        .feature-checkbox { accent-color: #a78bfa; width: 1.15rem; height: 1.15rem; margin-top: 2px; }
+        :root {
+            --border-width: 3px;
+            --shadow-offset: 4px;
+            --radius: 6px;
+        }
+
+        body { 
+            background-color: #fffaf0; /* Slightly warm paper tone */
+            font-family: 'Inter', sans-serif; 
+            color: #000;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Space Grotesk', sans-serif;
+            letter-spacing: -0.02em;
+        }
+
+        /* Neobrutalist Utils */
+        .neo-border {
+            border: var(--border-width) solid #000;
+        }
+        .neo-shadow {
+            box-shadow: var(--shadow-offset) var(--shadow-offset) 0px 0px #000;
+        }
+        .neo-shadow-hover:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px 0px #000;
+        }
+        .neo-card {
+            background: white;
+            border: var(--border-width) solid #000;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-offset) var(--shadow-offset) 0px 0px #000;
+            transition: all 0.2s ease;
+        }
+        .neo-card:hover {
+            box-shadow: 6px 6px 0px 0px #000;
+            transform: translate(-1px, -1px);
+        }
+
+        /* Inputs */
+        .form-input { 
+            border: var(--border-width) solid #000; 
+            border-radius: var(--radius); 
+            padding: 0.75rem 1rem; 
+            width: 100%; 
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+            background-color: #fff;
+            box-shadow: 2px 2px 0px 0px #ccc;
+            transition: all 0.2s;
+        }
+        .form-input:focus { 
+            outline: none; 
+            border-color: #000;
+            box-shadow: var(--shadow-offset) var(--shadow-offset) 0px 0px #000; 
+        }
+
+        /* Buttons */
+        .action-button { 
+            background-color: #fff; 
+            color: #000; 
+            font-family: 'Space Mono', monospace;
+            font-weight: 700; 
+            text-transform: uppercase;
+            padding: 0.75rem 1.5rem; 
+            border: var(--border-width) solid #000;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-offset) var(--shadow-offset) 0px 0px #000;
+            transition: all 0.1s;
+            display: inline-block; 
+            text-align: center; 
+            cursor: pointer; 
+        }
+        .action-button:hover { 
+            background-color: #f0f0f0;
+            transform: translate(2px, 2px); 
+            box-shadow: 2px 2px 0px 0px #000; 
+        }
+        .action-button.primary {
+            background-color: #000;
+            color: #fff;
+        }
+        .action-button.primary:hover {
+            background-color: #222;
+        }
+
+        /* Custom Checkboxes */
+        .feature-checkbox { 
+            appearance: none;
+            width: 1.25rem; 
+            height: 1.25rem; 
+            border: 2px solid #000;
+            border-radius: 2px;
+            margin-top: 2px;
+            display: grid;
+            place-content: center;
+            cursor: pointer;
+        }
+        .feature-checkbox::before {
+            content: "";
+            width: 0.75rem;
+            height: 0.75rem;
+            transform: scale(0);
+            transition: 120ms transform ease-in-out;
+            box-shadow: inset 1em 1em #000; /* Checkmark color */
+        }
+        .feature-checkbox:checked::before {
+            transform: scale(1);
+        }
         
-        /* Custom slider styles */
+        /* Sliders */
         input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
         input[type=range]:focus { outline: none; }
-        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; cursor: pointer; background: #e2e8f0; border-radius: 9999px; }
-        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%; background: #4b5563; cursor: pointer; margin-top: -6px; transition: background 0.2s; }
-        input[type=range]::-webkit-slider-thumb:hover { background: #1f2937; }
-        input[type=range]::-moz-range-track { width: 100%; height: 6px; cursor: pointer; background: #e2e8f0; border-radius: 9999px; }
-        input[type=range]::-moz-range-thumb { height: 18px; width: 18px; border-radius: 50%; background: #4b5563; cursor: pointer; border: none; }
+        input[type=range]::-webkit-slider-runnable-track { 
+            width: 100%; height: 12px; cursor: pointer; 
+            background: #fff; border: 2px solid #000; border-radius: 999px; 
+        }
+        input[type=range]::-webkit-slider-thumb { 
+            -webkit-appearance: none; 
+            height: 24px; width: 24px; 
+            border: 2px solid #000;
+            border-radius: 50%; 
+            background: #000; 
+            cursor: pointer; 
+            margin-top: -8px; /* Center thumb on track */
+            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.2);
+            transition: transform 0.1s;
+        }
+        input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.1); }
 
         .tech-name-button { cursor: pointer; user-select: none; }
-        .tech-name-button:hover { text-decoration: underline; }
-        .caret { transition: transform 0.2s ease-in-out; display: inline-block; margin-right: 0.5rem; }
+        .tech-name-button:hover { text-decoration: underline; text-decoration-thickness: 2px; }
+        .caret { transition: transform 0.2s ease-in-out; display: inline-block; margin-right: 0.5rem; font-weight: bold; }
         .caret-open { transform: rotate(90deg); }
         .page-content { display: none; animation: fadeIn 0.3s ease-in-out; }
         .page-content.active { display: block; }
         
         /* Admin Table */
-        .admin-table { width: 100%; border-collapse: separate; border-spacing: 0; border: 1px solid #e2e8f0; border-radius: 0.5rem; overflow: hidden; }
-        .admin-table th, .admin-table td { padding: 12px; text-align: left; font-size: 0.875rem; vertical-align: top; border-bottom: 1px solid #e2e8f0; }
-        .admin-table th { background-color: #f8fafc; font-weight: 600; color: #475569; }
+        .admin-table { 
+            width: 100%; border-collapse: separate; border-spacing: 0; 
+            border: var(--border-width) solid #000; 
+            border-radius: var(--radius); 
+            overflow: hidden; 
+        }
+        .admin-table th, .admin-table td { 
+            padding: 12px; text-align: left; 
+            font-size: 0.9rem; font-family: 'Space Mono', monospace;
+            vertical-align: middle; 
+            border-bottom: 2px solid #000; 
+        }
+        .admin-table th { 
+            background-color: #000; 
+            font-weight: 700; 
+            color: #fff; 
+            text-transform: uppercase;
+        }
         .admin-table tr:last-child td { border-bottom: none; }
-        .admin-table tr:hover td { background-color: #f8fafc; }
+        .admin-table tr:hover td { background-color: #fffce8; }
         
-        .hidden { display: none !important; }
-        .admin-table .edit-mode-item { display: flex; justify-content: space-between; align-items: center; padding: 4px 8px; background: #f1f5f9; margin-bottom: 2px; border-radius: 4px; }
-        .new-flag { background-color: #22c55e; color: white; font-size: 0.65rem; font-weight: bold; padding: 2px 6px; border-radius: 9999px; margin-left: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
-        .admin-table .view-mode ul { list-style-position: inside; padding-left: 4px; margin: 0; }
-        .admin-table .view-mode li::marker { content: '• '; color: #94a3b8; }
-        
-        .slider-container { padding: 1rem; background-color: #f9fafb; border-radius: 0.5rem; border: 1px solid #e5e7eb; margin-bottom: 1.5rem; }
-        .slider-label { font-size: 0.75rem; color: #6b7280; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; display: block; }
-        .slider-value-display { font-size: 0.875rem; font-weight: 600; color: #1f2937; margin-top: 0.25rem; }
+        .slider-container { 
+            padding: 1rem; 
+            background-color: #fff; 
+            border: 2px solid #000; 
+            border-radius: var(--radius); 
+            box-shadow: 3px 3px 0px 0px #000;
+            margin-bottom: 1.5rem; 
+        }
+        .slider-label { 
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem; color: #000; 
+            font-weight: 700; text-transform: uppercase; 
+            margin-bottom: 0.5rem; display: block; 
+        }
+        .slider-value-display { 
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1rem; font-weight: 700; color: #000; margin-top: 0.5rem; 
+        }
         
         /* Logo Styles */
-        .logo-bubble { position: absolute; border-radius: 50%; mix-blend-mode: multiply; opacity: 0.7; transition: all 0.3s ease; }
-        .logo-bubble:hover { opacity: 1; transform: scale(1.1); z-index: 10; }
+        .logo-bubble { 
+            position: absolute; border-radius: 50%; 
+            mix-blend-mode: normal; /* Better for borders */
+            opacity: 0.9; 
+            border: 2px solid #000;
+            transition: all 0.3s ease; 
+        }
+        .logo-bubble:hover { transform: scale(1.1); z-index: 10; cursor: pointer; }
+
+        .handwriting-font {
+            font-family: 'Permanent Marker', cursive;
+        }
+
+        .tag {
+            display: inline-block;
+            border: 2px solid #000;
+            padding: 2px 6px;
+            font-family: 'Space Mono', monospace;
+            font-weight: 700;
+            font-size: 0.7rem;
+            border-radius: 4px;
+            text-transform: uppercase;
+            box-shadow: 2px 2px 0px 0px #000;
+        }
+
+        .new-flag { background-color: #22c55e; color: black; border-color: black; }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(5px); }
             to { opacity: 1; transform: translateY(0); }
         }
     </style>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Indie+Flower&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body class="text-gray-800 antialiased min-h-screen flex flex-col">
+<body class="text-black antialiased min-h-screen flex flex-col selection:bg-black selection:text-white">
 
     <div class="container mx-auto p-4 md:p-8 max-w-6xl flex-grow">
-        <header class="flex flex-col md:flex-row justify-between items-center py-6 border-b border-gray-100 mb-8">
-            <div id="home-logo" class="h-16 w-16 relative cursor-pointer mb-4 md:mb-0" title="Functions scaled by feature count">
+        <header class="flex flex-col md:flex-row justify-between items-center py-6 mb-8 border-b-4 border-black">
+            <div id="home-logo" class="h-20 w-20 relative cursor-pointer mb-4 md:mb-0" title="Functions scaled by feature count">
                 <!-- SVG/Bubbles injected by JS -->
             </div>
-            <nav class="flex flex-wrap justify-center space-x-6 text-sm font-medium text-gray-500">
-                <a href="#technologies" class="nav-link hover:text-black transition-colors">All technologies</a>
+            <nav class="flex flex-wrap justify-center space-x-6 font-bold text-black font-['Space_Mono'] uppercase tracking-tight">
+                <a href="#technologies" class="nav-link hover:underline decoration-2 underline-offset-4">All technologies</a>
             </nav>
         </header>
 
@@ -78,25 +242,29 @@
             <section id="hero-section">
                 <div class="grid md:grid-cols-2 gap-12 py-12 items-center">
                     <div class="flex flex-col justify-center">
-                        <h1 class="text-5xl md:text-6xl font-bold leading-tight tracking-tight text-gray-900">Convivial<br>Operating<br>Stack</h1>
-                        <p class="mt-6 text-xl md:text-2xl text-gray-600 font-light">A toolbox of technologies tried and tested by countercultures.</p>
+                        <h1 class="text-6xl md:text-7xl font-bold leading-none tracking-tighter text-black mb-6">
+                            CONVIVIAL<br>OPERATING<br>STACK
+                        </h1>
+                        <div class="border-l-4 border-black pl-6 py-2">
+                            <p class="text-xl md:text-2xl text-black font-medium font-['Space_Grotesk']">A toolbox of technologies tried and tested by countercultures.</p>
+                        </div>
                     </div>
                     <div class="flex items-center justify-center md:justify-end">
-                        <div class="transform rotate-[-6deg]">
-                            <p class="text-4xl md:text-5xl text-gray-800 uppercase" style="font-family: 'Indie Flower', cursive; line-height: 1.2;">
+                        <div class="transform rotate-[-3deg] bg-white p-6 border-[3px] border-black shadow-[8px_8px_0px_0px_#000]">
+                            <p class="text-4xl md:text-5xl text-black handwriting-font leading-tight text-center transform rotate-3">
                                 the more we<br>share the more<br>we have
                             </p>
                         </div>
                     </div>
                 </div>
-                <div class="text-gray-600 space-y-4 text-sm border-t border-gray-100 pt-12 mt-4 max-w-4xl">
-                     <p>The COS is a continously evolving toolbox of what various post-growth groups are using as technological infrastructure. It supports methodological luddism - helping to choose what technologies you actually need, and what you don't need.</p>
+                <div class="text-black space-y-4 text-lg border-t-4 border-black pt-12 mt-4 max-w-4xl">
+                     <p>The COS is a continously evolving toolbox of what various post-growth groups are using as technological infrastructure. It supports methodological luddism - helping to choose what technologies you actually need, and what you <strong>don't</strong> need.</p>
                      
                      <div class="flex flex-col md:flex-row gap-6 items-center pt-8">
-                        <a href="#assemble" class="action-button nav-link shadow-xl bg-gray-900 text-lg px-8 py-4">Assemble your Convivial Operating Stack</a>
-                        <span class="text-gray-400 italic font-serif text-lg">or</span>
-                        <a href="#evaluate" class="action-button nav-link bg-white text-gray-800 border-2 border-gray-200 hover:bg-gray-50 hover:border-gray-400 text-lg px-8 py-4">Evaluate technologies you've tested</a>
-                        <span id="version-tracker" class="text-xs text-gray-400 font-mono pl-2 mt-4 md:mt-0"></span>
+                        <a href="#assemble" class="action-button primary text-xl px-8 py-4">Assemble your Stack</a>
+                        <span class="text-black italic font-serif text-lg">or</span>
+                        <a href="#evaluate" class="action-button text-lg px-8 py-4">Evaluate Tools</a>
+                        <span id="version-tracker" class="tag bg-yellow-400"></span>
                      </div>
                 </div>
             </section>
@@ -104,11 +272,12 @@
 
         <!-- 5a. Assemble COS Page -->
         <section id="assemble-page" class="page-content">
-            <h2 class="text-3xl font-bold mb-8">Assemble your Convivial Operating Stack</h2>
-            <div class="grid md:grid-cols-2 gap-12 relative">
-                <div class="md:border-r md:border-gray-200 md:pr-12">
-                    <div class="sticky top-4">
-                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Your Group</h3>
+            <h2 class="text-4xl font-bold mb-8 uppercase border-b-4 border-black inline-block pb-2">Assemble your Stack</h2>
+            <div class="grid md:grid-cols-12 gap-12 relative">
+                <!-- Sidebar -->
+                <div class="md:col-span-5 lg:col-span-4">
+                    <div class="sticky top-4 space-y-6">
+                        <div class="bg-black text-white p-2 font-['Space_Mono'] font-bold uppercase text-center border-2 border-black">Parameters</div>
                         
                         <div class="slider-container">
                             <label class="slider-label">Technology knowledge</label>
@@ -120,21 +289,24 @@
                             <input type="range" id="assemble-size-slider" min="1" max="5" step="1" value="2">
                             <div id="assemble-size-display" class="slider-value-display">Smallish Group (6-15)</div>
                         </div>
-                        <div class="mb-6 p-4 bg-teal-50 border border-teal-100 rounded-lg">
+                        <div class="p-4 bg-teal-100 border-[3px] border-black rounded-md shadow-[4px_4px_0px_0px_#000]">
                             <label class="flex items-center space-x-3 cursor-pointer">
-                                <input type="checkbox" id="assemble-floss-filter" class="feature-checkbox h-5 w-5 text-teal-600 rounded">
-                                <span class="text-sm font-bold text-teal-900">Strictly Open Source</span>
+                                <input type="checkbox" id="assemble-floss-filter" class="feature-checkbox bg-white">
+                                <span class="font-bold text-black font-['Space_Mono'] uppercase">Strictly Open Source</span>
                             </label>
-                            <p class="text-xs text-teal-600 mt-1 ml-8">Only show Open Source</p>
                         </div>
-                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4 mt-8">Features Needed</h3>
-                        <p class="text-gray-600 mb-6 text-sm">Select the features useful to your group.</p>
-                        <div id="assemble-features-container" class="space-y-3 max-h-[40vh] overflow-y-auto pr-2"></div>
+
+                        <div class="mt-8">
+                            <div class="bg-black text-white p-2 font-['Space_Mono'] font-bold uppercase text-center border-2 border-black mb-4">Features Needed</div>
+                            <div id="assemble-features-container" class="space-y-2 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar"></div>
+                        </div>
                     </div>
                 </div>
-                <div>
-                    <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Recommended Stack</h3>
-                    <p class="text-gray-600 mb-6 text-sm">Technologies ranked by how well they match what you need.</p>
+                <!-- Results -->
+                <div class="md:col-span-7 lg:col-span-8">
+                    <div class="flex items-center justify-between mb-6">
+                         <h3 class="text-xl font-bold font-['Space_Mono'] uppercase">Recommended Stack</h3>
+                    </div>
                     <div id="assemble-results-container" class="space-y-8"></div>
                 </div>
             </div>
@@ -142,61 +314,56 @@
 
         <!-- 5b. Evaluate Technologies Page -->
         <section id="evaluate-page" class="page-content">
-             <div class="max-w-2xl mx-auto">
-                <h2 class="text-3xl font-bold mb-2">Evaluation</h2>
-                <p class="text-gray-500 mb-8">Share your experience of specific technologies.</p>
+             <div class="max-w-3xl mx-auto">
+                <div class="border-l-4 border-black pl-6 mb-8">
+                    <h2 class="text-4xl font-bold uppercase">Evaluation</h2>
+                    <p class="text-gray-600 font-['Space_Mono'] mt-2">Share your experience of specific technologies.</p>
+                </div>
                 
-                <div id="evaluate-form-container" class="space-y-6 bg-gray-50 p-8 rounded-xl border border-gray-100">
+                <div id="evaluate-form-container" class="space-y-8 bg-white p-8 border-[3px] border-black shadow-[8px_8px_0px_0px_#000]">
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Which technology are we talking about?</label>
-                        <select id="evaluate-tech-select" class="form-input bg-white"></select>
-                        <input type="text" id="new-technology-input" class="form-input mt-2 text-sm bg-white" placeholder="Or add a new technology + Enter...">
+                        <label class="block text-sm font-bold font-['Space_Mono'] uppercase mb-2">Technology</label>
+                        <select id="evaluate-tech-select" class="form-input"></select>
+                        <input type="text" id="new-technology-input" class="form-input mt-4" placeholder="Or type new tech + Enter...">
                     </div>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Required technology knowledge</label>
-                            <div class="bg-white p-3 border rounded">
-                                <input type="range" id="evaluate-tech-slider" min="1" max="5" step="1" value="3" class="w-full">
-                                <div id="evaluate-tech-display" class="text-xs text-center font-bold mt-1 text-purple-600">Comfortable with new software</div>
-                            </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                         <div class="slider-container mb-0 shadow-none">
+                            <label class="slider-label">Needed tech knowledge</label>
+                            <input type="range" id="evaluate-tech-slider" min="1" max="5" step="1" value="3">
+                            <div id="evaluate-tech-display" class="slider-value-display text-center text-purple-600">Comfortable with new software</div>
                         </div>
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Used for group size</label>
-                            <div class="bg-white p-3 border rounded">
-                                <input type="range" id="evaluate-size-slider" min="1" max="5" step="1" value="2" class="w-full">
-                                <div id="evaluate-size-display" class="text-xs text-center font-bold mt-1 text-purple-600">Smallish Group (6-15)</div>
-                            </div>
+                        <div class="slider-container mb-0 shadow-none">
+                            <label class="slider-label">Used for group size</label>
+                            <input type="range" id="evaluate-size-slider" min="1" max="5" step="1" value="2">
+                            <div id="evaluate-size-display" class="slider-value-display text-center text-purple-600">Smallish Group (6-15)</div>
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">What does it help out with?</label>
-                        <input type="search" id="evaluate-features-search" class="form-input text-sm bg-white mb-2" placeholder="Search features...">
-                        <div id="evaluate-features-container" class="p-3 border border-gray-200 rounded-md max-h-40 overflow-y-auto bg-white"></div>
+                        <label class="block text-sm font-bold font-['Space_Mono'] uppercase mb-2">What does it help with?</label>
+                        <input type="search" id="evaluate-features-search" class="form-input mb-4" placeholder="Search features...">
+                        <div id="evaluate-features-container" class="p-4 border-[2px] border-black bg-gray-50 max-h-48 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-2"></div>
                     </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Which ends does it support?</label>
-                        <div id="evaluate-purposes-container" class="p-3 border border-gray-200 rounded-md max-h-32 overflow-y-auto bg-white"></div>
-                        <input type="text" id="new-purpose-input" class="form-input mt-2 text-sm bg-white" placeholder="Add a new purpose + Enter...">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Comments</label>
-                        <textarea id="evaluation-comment" class="form-input bg-white" rows="3" placeholder="Your review of how this was useful/not useful for your group."></textarea>
-                    </div>
-                    <div id="conviviality-questions" class="pt-4 border-t border-gray-200">
-                         <div class="flex justify-between items-baseline mb-4">
-                            <label class="block text-sm font-semibold text-gray-700">Conviviality Score</label>
-                            <span class="text-xs text-gray-400 italic">Based on the Matrix of Convivial Technology (Vetter, 2018)</span>
+                    
+                    <div id="conviviality-questions" class="pt-6 border-t-4 border-black">
+                         <div class="flex justify-between items-baseline mb-6">
+                            <label class="text-lg font-bold uppercase bg-black text-white px-2 py-1">Conviviality Score</label>
+                            <span class="text-xs font-['Space_Mono'] border border-black px-2 py-1 bg-white">Ref: Vetter (2018)</span>
                          </div>
-                         <div id="conviviality-sliders-container" class="space-y-5"></div>
+                         <div id="conviviality-sliders-container" class="space-y-6"></div>
                     </div>
-                    <div class="pt-4">
-                        <button id="save-evaluation-button" class="action-button w-full md:w-auto">Submit Evaluation</button>
-                        <p id="save-error-message" class="text-sm text-red-600 mt-3 hidden"></p>
-                        <p id="save-confirmation-message" class="text-sm text-green-600 mt-3 hidden font-medium flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
-                            <span>Evaluation saved successfully.</span>
+                    
+                    <div class="pt-4 border-t-4 border-black">
+                        <label class="block text-sm font-bold font-['Space_Mono'] uppercase mb-2 mt-4">Comments</label>
+                        <textarea id="evaluation-comment" class="form-input" rows="3" placeholder="Your review..."></textarea>
+                    </div>
+
+                    <div class="pt-6">
+                        <button id="save-evaluation-button" class="action-button primary w-full text-lg py-4">Submit Evaluation</button>
+                        <p id="save-error-message" class="text-sm font-bold text-red-600 mt-4 hidden bg-red-100 p-2 border-2 border-red-600 text-center"></p>
+                        <p id="save-confirmation-message" class="text-sm font-bold text-green-700 mt-4 hidden bg-green-100 p-2 border-2 border-green-700 flex justify-center items-center">
+                            <span>EVALUATION SAVED.</span>
                         </p>
                     </div>
                 </div>
@@ -204,40 +371,40 @@
         </section>
 
         <section id="technologies-page" class="page-content">
-             <h2 class="text-3xl font-bold mb-8">Technologies</h2>
-             <div id="technologies-list-container" class="space-y-12"></div>
+             <h2 class="text-4xl font-bold mb-8 uppercase border-b-4 border-black inline-block pb-2">Technologies</h2>
+             <div id="technologies-list-container" class="space-y-6"></div>
         </section>
 
         <section id="admin-login-page" class="page-content">
-            <div class="max-w-md mx-auto mt-12 bg-gray-50 p-8 rounded-xl border border-gray-100">
-                <h2 class="text-2xl font-bold mb-6 text-center">Admin Login</h2>
-                <form id="admin-login-form" class="space-y-4">
+            <div class="max-w-md mx-auto mt-12 bg-white p-8 border-[3px] border-black shadow-[8px_8px_0px_0px_#000]">
+                <h2 class="text-3xl font-bold mb-8 text-center uppercase">Admin Login</h2>
+                <form id="admin-login-form" class="space-y-6">
                     <div>
-                        <label for="admin-email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                        <input type="email" id="admin-email" class="form-input bg-white" value="admin@cos.com">
+                        <label for="admin-email" class="block text-sm font-bold font-['Space_Mono'] uppercase mb-2">Email</label>
+                        <input type="email" id="admin-email" class="form-input" value="admin@cos.com">
                     </div>
                     <div>
-                        <label for="admin-password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                        <input type="password" id="admin-password" class="form-input bg-white" value="password">
+                        <label for="admin-password" class="block text-sm font-bold font-['Space_Mono'] uppercase mb-2">Password</label>
+                        <input type="password" id="admin-password" class="form-input" value="password">
                     </div>
-                    <p id="admin-login-error" class="text-red-500 text-sm hidden bg-red-50 p-2 rounded">Invalid credentials.</p>
+                    <p id="admin-login-error" class="text-red-600 font-bold text-sm hidden bg-red-100 p-2 border-2 border-red-600">Invalid credentials.</p>
                     <button type="submit" class="action-button w-full">Login</button>
-                    <p class="text-xs text-center text-gray-400 mt-4">Hint: Use pre-filled credentials</p>
+                    <p class="text-xs text-center font-['Space_Mono'] text-gray-500 mt-4">Hint: Use pre-filled credentials</p>
                 </form>
             </div>
         </section>
         
         <section id="admin-dashboard-page" class="page-content">
-            <div class="flex justify-between items-end mb-8">
-                <h2 class="text-3xl font-bold">Admin Dashboard</h2>
-                <button id="admin-logout" class="text-sm text-red-500 hover:text-red-700 font-medium">Logout</button>
+            <div class="flex justify-between items-end mb-8 border-b-4 border-black pb-4">
+                <h2 class="text-3xl font-bold uppercase">Admin Dashboard</h2>
+                <button id="admin-logout" class="text-sm font-bold text-red-600 hover:text-white hover:bg-red-600 px-2 py-1 border-2 border-red-600 transition-colors uppercase">Logout</button>
             </div>
-            <div id="admin-dashboard-container" class="space-y-12"></div>
+            <div id="admin-dashboard-container" class="space-y-16"></div>
         </section>
 
-        <footer class="text-right py-8 mt-12 border-t border-gray-100">
+        <footer class="text-right py-8 mt-16 border-t-4 border-black">
             <div class="container mx-auto px-4">
-                <a href="#admin-login" id="admin-login-link" class="nav-link text-xs text-gray-400 hover:text-gray-600 transition-colors">Admin Login</a>
+                <a href="#admin-login" id="admin-login-link" class="nav-link text-xs font-bold font-['Space_Mono'] text-gray-400 hover:text-black uppercase">Admin Access</a>
             </div>
         </footer>
     </div>
@@ -246,13 +413,13 @@
     document.addEventListener('DOMContentLoaded', () => {
         // --- DATA ---
         const appData = {
-            version: 1.7,
+            version: 1.8,
             // Colors: Magenta, Purple, Teal, Yellow
             functions: [
-                { id: 'commons', name: 'Collaborative Commons', color: '#db2777', accent: 'accent-pink-600' }, // Magenta (pink-600)
+                { id: 'commons', name: 'Collaborative Commons', color: '#ec4899', accent: 'accent-pink-500' }, // Vibrant Pink (pink-500)
                 { id: 'admin', name: 'Assisted Administration', color: '#9333ea', accent: 'accent-purple-600' }, // Purple (purple-600)
                 { id: 'production', name: 'Peer Production', color: '#0d9488', accent: 'accent-teal-600' }, // Teal (teal-600)
-                { id: 'economy', name: 'Egalitarian Economy', color: '#ca8a04', accent: 'accent-yellow-600' }, // Yellow (yellow-600 - darker for text contrast)
+                { id: 'economy', name: 'Egalitarian Economy', color: '#eab308', accent: 'accent-yellow-500' }, // Stronger Yellow (yellow-500)
             ],
             // Features mapped to the new 4 functions
             features: [
@@ -294,9 +461,9 @@
             ],
             techProficiencyLevels: [
                 { id: 1, name: 'Happy luddites' },
-                { id: 2, name: 'Basic technology users (email, social media)' },
+                { id: 2, name: 'Basic technology users' },
                 { id: 3, name: 'Comfortable with new software' },
-                { id: 4, name: 'Some technology experts in the group' },
+                { id: 4, name: 'Some technology experts' },
                 { id: 5, name: 'Able to code' },
             ],
             groupSizes: [
@@ -308,85 +475,79 @@
             ],
             technologies: [
                 { id: 1, name: 'Discord', isOpenSource: false, evaluations: [
-                    { techProficiency: 3, groupSize: 4, convivialityScore: 2.5, comment: "Great for quick chats, but can be overwhelming and extractive.", features: ['f1', 'f2'], purposes: ['p1'] },
+                    { techProficiency: 3, groupSize: 4, convivialityScore: 2.5, comment: "Great for quick chats, but can be overwhelming and extractive.", features: ['f1', 'f2'] },
                 ]},
                 { id: 2, name: 'WhatsApp', isOpenSource: false, evaluations: [
-                     { techProficiency: 1, groupSize: 2, convivialityScore: 1.5, comment: "Super easy to use, but owned by Meta. Privacy concerns.", features: ['f1', 'f2'], purposes: ['p1'] }
+                     { techProficiency: 1, groupSize: 2, convivialityScore: 1.5, comment: "Super easy to use, but owned by Meta. Privacy concerns.", features: ['f1', 'f2'] }
                 ]},
                 { id: 3, name: 'Open Collective', isOpenSource: true, evaluations: [
-                    { techProficiency: 2, groupSize: 3, convivialityScore: 9.2, comment: "A game-changer for transparent finances and reducing admin load.", features: ['f10', 'f11', 'f12', 'f13', 'f14', 'f15', 'f4', 'f5'], purposes: ['p2'] }
+                    { techProficiency: 2, groupSize: 3, convivialityScore: 9.2, comment: "A game-changer for transparent finances and reducing admin load.", features: ['f10', 'f11', 'f12', 'f13', 'f14', 'f15', 'f4', 'f5'] }
                 ] },
                 { id: 4, name: 'Trello', isOpenSource: false, evaluations: [
-                    { techProficiency: 2, groupSize: 2, convivialityScore: 3.0, comment: "Visual and intuitive, but proprietary software.", features: ['f6', 'f_kanban'], purposes: ['p1', 'p2'] }
+                    { techProficiency: 2, groupSize: 2, convivialityScore: 3.0, comment: "Visual and intuitive, but proprietary software.", features: ['f6', 'f_kanban'] }
                 ]},
                 { id: 5, name: 'Facebook', isOpenSource: false, evaluations: [
-                    { techProficiency: 4, groupSize: 5, convivialityScore: 1.0, comment: "Feels invasive and constantly tries to sell you things. Hard to control your own data.", features: ['f1', 'f2'], purposes: ['p1'] }
+                    { techProficiency: 4, groupSize: 5, convivialityScore: 1.0, comment: "Feels invasive and constantly tries to sell you things. Hard to control your own data.", features: ['f1', 'f2'] }
                 ]},
                 // Framasoft Suite
                 { id: 6, name: 'Framadate', isOpenSource: true, evaluations: [
-                    { techProficiency: 1, groupSize: 2, convivialityScore: 9.8, comment: "Simple, ethical scheduling without ads.", features: ['f_plan1'], purposes: ['p1'] }
+                    { techProficiency: 1, groupSize: 2, convivialityScore: 9.8, comment: "Simple, ethical scheduling without ads.", features: ['f_plan1'] }
                 ]},
                 { id: 7, name: 'Framapad', isOpenSource: true, evaluations: [
-                    { techProficiency: 2, groupSize: 2, convivialityScore: 9.5, comment: "Excellent for taking minutes together in real time.", features: ['f_write', 'f3'], purposes: ['p1'] }
+                    { techProficiency: 2, groupSize: 2, convivialityScore: 9.5, comment: "Excellent for taking minutes together in real time.", features: ['f_write', 'f3'] }
                 ]},
                 { id: 8, name: 'Framacalc', isOpenSource: true, evaluations: [
-                    { techProficiency: 2, groupSize: 2, convivialityScore: 9.0, comment: "Like Excel but online and collaborative. Very useful.", features: ['f_calc', 'f4', 'f5'], purposes: ['p2'] }
+                    { techProficiency: 2, groupSize: 2, convivialityScore: 9.0, comment: "Like Excel but online and collaborative. Very useful.", features: ['f_calc', 'f4', 'f5'] }
                 ]},
                 { id: 9, name: 'Framavox', isOpenSource: true, evaluations: [
-                    { techProficiency: 3, groupSize: 3, convivialityScore: 8.8, comment: "Great for Loomio-style decision making.", features: ['f_decide', 'f3'], purposes: ['p1'] }
+                    { techProficiency: 3, groupSize: 3, convivialityScore: 8.8, comment: "Great for Loomio-style decision making.", features: ['f_decide', 'f3'] }
                 ]},
                 { id: 10, name: 'Framaforms', isOpenSource: true, evaluations: [
-                    { techProficiency: 2, groupSize: 4, convivialityScore: 9.2, comment: "Drag and drop form builder, respectful of privacy.", features: ['f_form', 'f11'], purposes: ['p1'] }
+                    { techProficiency: 2, groupSize: 4, convivialityScore: 9.2, comment: "Drag and drop form builder, respectful of privacy.", features: ['f_form', 'f11'] }
                 ]},
                 { id: 11, name: 'Framamind', isOpenSource: true, evaluations: [
-                    { techProficiency: 2, groupSize: 2, convivialityScore: 8.5, comment: "Good for initial brainstorming sessions.", features: ['f_map', 'f3'], purposes: ['p1'] }
+                    { techProficiency: 2, groupSize: 2, convivialityScore: 8.5, comment: "Good for initial brainstorming sessions.", features: ['f_map', 'f3'] }
                 ]},
                 { id: 12, name: 'Mobilizon', isOpenSource: true, evaluations: [
-                    { techProficiency: 3, groupSize: 4, convivialityScore: 9.2, comment: "A powerful alternative to Facebook Events.", features: ['f_event', 'f1', 'f2'], purposes: ['p1'] }
+                    { techProficiency: 3, groupSize: 4, convivialityScore: 9.2, comment: "A powerful alternative to Facebook Events.", features: ['f_event', 'f1', 'f2'] }
                 ]},
                 { id: 13, name: 'Framagit', isOpenSource: true, evaluations: [
-                    { techProficiency: 4, groupSize: 3, convivialityScore: 9.0, comment: "Essential for sharing code and open source projects.", features: ['f_git', 'f7'], purposes: ['p3'] }
+                    { techProficiency: 4, groupSize: 3, convivialityScore: 9.0, comment: "Essential for sharing code and open source projects.", features: ['f_git', 'f7'] }
                 ]},
                 { id: 14, name: 'Framatalk', isOpenSource: true, evaluations: [
-                    { techProficiency: 2, groupSize: 1, convivialityScore: 8.5, comment: "Video conferencing that just works in the browser.", features: ['f2'], purposes: ['p1'] }
+                    { techProficiency: 2, groupSize: 1, convivialityScore: 8.5, comment: "Video conferencing that just works in the browser.", features: ['f2'] }
                 ]},
                 { id: 15, name: 'Framaspace', isOpenSource: true, evaluations: [
-                    { techProficiency: 3, groupSize: 3, convivialityScore: 9.5, comment: "Complete cloud storage and collaboration suite based on Nextcloud.", features: ['f7', 'f2', 'f11'], purposes: ['p1'] }
+                    { techProficiency: 3, groupSize: 3, convivialityScore: 9.5, comment: "Complete cloud storage and collaboration suite based on Nextcloud.", features: ['f7', 'f2', 'f11'] }
                 ]},
                 { id: 16, name: 'Framalistes', isOpenSource: true, evaluations: [
-                    { techProficiency: 2, groupSize: 4, convivialityScore: 9.0, comment: "Classic email lists for group coordination.", features: ['f2'], purposes: ['p1'] }
+                    { techProficiency: 2, groupSize: 4, convivialityScore: 9.0, comment: "Classic email lists for group coordination.", features: ['f2'] }
                 ]},
                 { id: 17, name: 'Framateam', isOpenSource: true, evaluations: [
-                    { techProficiency: 3, groupSize: 3, convivialityScore: 9.0, comment: "Team chat alternative to Slack/Discord.", features: ['f1', 'f2'], purposes: ['p1'] }
+                    { techProficiency: 3, groupSize: 3, convivialityScore: 9.0, comment: "Team chat alternative to Slack/Discord.", features: ['f1', 'f2'] }
                 ]},
                 { id: 18, name: 'Framaboard', isOpenSource: true, evaluations: [
-                    { techProficiency: 2, groupSize: 2, convivialityScore: 9.0, comment: "Kanban board for task management. Alternative to Trello.", features: ['f6', 'f_kanban'], purposes: ['p1'] }
+                    { techProficiency: 2, groupSize: 2, convivialityScore: 9.0, comment: "Kanban board for task management. Alternative to Trello.", features: ['f6', 'f_kanban'] }
                 ]},
                 { id: 19, name: 'Framabag', isOpenSource: true, evaluations: [
-                    { techProficiency: 2, groupSize: 1, convivialityScore: 9.2, comment: "Save web pages to read later. Alternative to Pocket.", features: ['f_save', 'f11'], purposes: ['p1'] }
+                    { techProficiency: 2, groupSize: 1, convivialityScore: 9.2, comment: "Save web pages to read later. Alternative to Pocket.", features: ['f_save', 'f11'] }
                 ]},
                 { id: 20, name: 'PeerTube', isOpenSource: true, evaluations: [
-                    { techProficiency: 4, groupSize: 4, convivialityScore: 9.5, comment: "Decentralized video hosting platform. Alternative to YouTube.", features: ['f_video', 'f7'], purposes: ['p1'] }
+                    { techProficiency: 4, groupSize: 4, convivialityScore: 9.5, comment: "Decentralized video hosting platform. Alternative to YouTube.", features: ['f_video', 'f7'] }
                 ]},
                 { id: 21, name: 'Framablog', isOpenSource: true, evaluations: [
-                    { techProficiency: 3, groupSize: 3, convivialityScore: 9.0, comment: "Lightweight blog to share news.", features: ['f_blog', 'f1'], purposes: ['p1'] }
+                    { techProficiency: 3, groupSize: 3, convivialityScore: 9.0, comment: "Lightweight blog to share news.", features: ['f_blog', 'f1'] }
                 ]},
-                // Added Thingiverse
                 { id: 22, name: 'Thingiverse', isOpenSource: false, evaluations: [
-                    { techProficiency: 3, groupSize: 5, convivialityScore: 4.0, comment: "Massive library of 3D designs, but corporate-owned.", features: ['f_3d'], purposes: ['p1'] }
+                    { techProficiency: 3, groupSize: 5, convivialityScore: 4.0, comment: "Massive library of 3D designs, but corporate-owned.", features: ['f_3d'] }
                 ]}
-            ],
-            purposes: [
-                { id: 'p1', name: 'Own land' },
-                { id: 'p2', name: 'Own property' },
-                { id: 'p3', name: 'Be self-sufficient in energy' }
             ],
             // Modified per Vetter (2018)
             convivialityQuestions: [
                 { id: 'relatedness', question: 'Relatedness: Does it help us relate to each other?' },
                 { id: 'accessibility', question: 'Accessibility: Can anyone access and understand it?' },
                 { id: 'adaptability', question: 'Adaptability: Can we adapt and repair it?' },
-                { id: 'biointeraction', question: 'Bio-interaction: Is it compatible with life?' },
+                { id: 'biointeraction', question: 'Bio-interaction: Is it ecologically sustainable?' },
                 { id: 'appropriateness', question: 'Appropriateness: Does it fit our specific situation?' },
             ]
         };
@@ -398,7 +559,6 @@
             getFunctions: () => appData.functions,
             getFeatures: () => appData.features,
             getTechnologies: () => appData.technologies,
-            getPurposes: () => appData.purposes,
             getTechProficiencyLevels: () => appData.techProficiencyLevels,
             getGroupSizes: () => appData.groupSizes,
             getConvivialityQuestions: () => appData.convivialityQuestions,
@@ -428,9 +588,6 @@
             addEvaluation: (techId, evaluationData) => {
                 const tech = dataService.getTechnologyById(techId);
                 if (tech) tech.evaluations.push(evaluationData);
-            },
-            addPurpose: (name) => {
-                appData.purposes.push({ id: `p${Date.now()}`, name });
             },
              addTechProficiency: (name) => {
                 const maxLevel = Math.max(0, ...appData.techProficiencyLevels.map(l => l.id));
@@ -470,15 +627,10 @@
                             comment: "Admin-assigned features.", 
                             convivialityScore: 0, 
                             techProficiency: 0, 
-                            groupSize: 1,
-                            purposes: [] 
+                            groupSize: 1
                         });
                     }
                 }
-            },
-             updatePurpose: (id, newName) => {
-                const item = appData.purposes.find(p => p.id == id);
-                if (item) item.name = newName;
             },
             updateTechProficiency: (id, newName) => {
                 const item = appData.techProficiencyLevels.find(l => l.id == id);
@@ -502,9 +654,6 @@
             deleteTechnology: (id) => {
                 appData.technologies = appData.technologies.filter(t => t.id != id);
             },
-            deletePurpose: (id) => {
-                appData.purposes = appData.purposes.filter(p => p.id != id);
-            },
             deleteTechProficiency: (id) => {
                 appData.techProficiencyLevels = appData.techProficiencyLevels.filter(l => l.id != id);
             },
@@ -524,7 +673,6 @@
         const evaluateTechProficiency = document.getElementById('evaluate-tech-proficiency');
         const evaluateFeaturesSearch = document.getElementById('evaluate-features-search');
         const evaluateFeaturesContainer = document.getElementById('evaluate-features-container');
-        const newPurposeInput = document.getElementById('new-purpose-input');
         const saveEvaluationButton = document.getElementById('save-evaluation-button');
         const evaluationComment = document.getElementById('evaluation-comment');
         const convivialitySlidersContainer = document.getElementById('conviviality-sliders-container');
@@ -683,12 +831,12 @@
         const renderConvivialitySliders = () => {
             convivialitySlidersContainer.innerHTML = dataService.getConvivialityQuestions().map(q => `
                 <div>
-                    <div class="flex justify-between mb-1">
-                        <label class="text-xs text-gray-600">${q.question}</label>
-                        <span class="text-xs font-bold text-gray-800" id="val-${q.id}">5</span>
+                    <div class="flex justify-between mb-1 items-end">
+                        <label class="text-sm font-bold font-['Space_Mono'] uppercase max-w-[80%]">${q.question}</label>
+                        <span class="text-lg font-bold bg-black text-white px-2 rounded-sm" id="val-${q.id}">5</span>
                     </div>
                     <input type="range" min="1" max="10" value="5" class="w-full" data-conv-id="${q.id}" oninput="document.getElementById('val-${q.id}').textContent = this.value">
-                    <div class="flex justify-between text-[10px] text-gray-400 mt-1">
+                    <div class="flex justify-between text-xs font-['Space_Mono'] text-gray-500 mt-1 uppercase">
                         <span>Low</span>
                         <span>High</span>
                     </div>
@@ -702,18 +850,16 @@
             updateSliderDisplay(assembleSizeSlider, assembleSizeDisplay, 'size');
 
             const allFeatures = dataService.getFeatures();
-            // Preserve checked state if re-rendering (though sidebar usually static)
-            // For now simply re-render
             const existingContainer = document.getElementById('assemble-features-container');
             const checkedIds = Array.from(existingContainer.querySelectorAll('input:checked')).map(cb => cb.value);
 
             assembleFeaturesContainer.innerHTML = allFeatures.map(feat => {
-                const newFlag = feat.isNew ? '<span class="new-flag">new</span>' : '';
+                const newFlag = feat.isNew ? '<span class="tag new-flag ml-2">new</span>' : '';
                 const isChecked = checkedIds.includes(feat.id) ? 'checked' : '';
                 return `
-                    <label class="flex items-start space-x-3 cursor-pointer p-2 hover:bg-gray-50 rounded transition-colors group">
-                        <input type="checkbox" value="${feat.id}" class="feature-checkbox mt-1" ${isChecked}>
-                        <div class="text-sm text-gray-700 group-hover:text-gray-900 transition-colors">
+                    <label class="flex items-center space-x-3 cursor-pointer p-2 hover:bg-yellow-50 transition-colors border-b border-gray-200 last:border-0 group">
+                        <input type="checkbox" value="${feat.id}" class="feature-checkbox" ${isChecked}>
+                        <div class="text-sm font-['Inter'] font-medium group-hover:text-black transition-colors">
                             ${feat.name}
                             ${newFlag}
                         </div>
@@ -732,8 +878,8 @@
 
             if (selectedFeatureIds.length === 0) {
                  assembleResultsContainer.innerHTML = `
-                    <div class="text-center py-12 border-2 border-dashed border-gray-200 rounded-lg">
-                        <p class="text-gray-400">Select features on the left to see results.</p>
+                    <div class="text-center py-12 border-[3px] border-dashed border-gray-300 rounded-lg">
+                        <p class="text-gray-500 font-['Space_Mono'] uppercase">Select features on the left to see results.</p>
                     </div>
                  `;
                  return;
@@ -771,15 +917,15 @@
 
             if (rankedTech.length === 0) {
                  assembleResultsContainer.innerHTML = `
-                    <div class="p-6 bg-yellow-50 text-yellow-800 rounded-lg border border-yellow-100">
-                        <h4 class="font-bold mb-2">No matches found</h4>
-                        <p class="text-sm">Try increasing your <strong>Technology knowledge</strong> slider or adjusting the <strong>Group Size</strong> to see more options.${strictlyOpenSource ? '<br>You can also try unchecking "Strictly Open Source".' : ''}</p>
+                    <div class="p-6 bg-yellow-100 border-[3px] border-black text-black rounded-lg">
+                        <h4 class="font-bold mb-2 font-['Space_Grotesk'] text-xl">NO MATCHES FOUND</h4>
+                        <p class="font-['Space_Mono'] text-sm">Try increasing your <strong>Technology knowledge</strong> slider or adjusting the <strong>Group Size</strong> to see more options.${strictlyOpenSource ? '<br>You can also try unchecking "Strictly Open Source".' : ''}</p>
                     </div>`;
                  return;
             }
 
             const headerHTML = `
-                <div class="grid grid-cols-[1fr_auto] gap-4 text-xs text-gray-400 font-bold uppercase tracking-wider mb-4 border-b pb-2">
+                <div class="grid grid-cols-[1fr_auto] gap-4 text-xs font-bold uppercase tracking-wider mb-4 border-b-2 border-black pb-2 font-['Space_Mono']">
                     <span>Technology</span>
                     <div class="grid grid-cols-2 gap-6">
                         <span class="w-16 text-center">Match</span>
@@ -789,8 +935,6 @@
             `;
             assembleResultsContainer.innerHTML = headerHTML;
 
-            const relevantFunctionIds = [...new Set(rankedTech.flatMap(t => t.aggData.functionIds))];
-
             dataService.getFunctions().forEach(func => {
                 const techForFunc = rankedTech.filter(t => t.aggData.functionIds.includes(func.id));
                 if (techForFunc.length > 0) {
@@ -799,30 +943,30 @@
                         const convScoreText = scores.conviviality !== null ? scores.conviviality.toFixed(1) : '-';
                         const matchText = `${t.matchScore}/${selectedFeatureIds.length}`;
                         return `
-                            <div class="bg-white border border-gray-100 rounded-lg shadow-sm mb-2 overflow-hidden hover:shadow-md transition-shadow">
-                                <div class="grid grid-cols-[1fr_auto] gap-4 items-center text-sm p-4">
-                                    <div class="flex items-center tech-name-button font-medium text-gray-800" data-tech-id="${t.id}">
-                                        <span class="caret text-gray-400 text-xs">&#9656;</span>
+                            <div class="neo-card mb-4 overflow-hidden">
+                                <div class="grid grid-cols-[1fr_auto] gap-4 items-center text-sm p-4 hover:bg-gray-50 transition-colors">
+                                    <div class="flex items-center tech-name-button font-bold text-lg font-['Space_Grotesk']" data-tech-id="${t.id}">
+                                        <span class="caret text-black mr-2">▶</span>
                                         <span>${t.name}</span>
-                                        ${t.isOpenSource ? '<span class="ml-2 px-1.5 py-0.5 rounded text-[10px] font-bold bg-green-100 text-green-700 border border-green-200" title="Open Source">FLOSS</span>' : ''}
+                                        ${t.isOpenSource ? '<span class="ml-2 tag bg-green-200 border-black" title="Open Source">FLOSS</span>' : ''}
                                     </div>
-                                    <div class="grid grid-cols-2 gap-6">
-                                        <span class="font-bold w-16 text-center text-blue-500 bg-blue-50 rounded py-1">${matchText}</span>
-                                        <span class="font-bold w-16 text-center py-1 ${getScoreColor(scores.conviviality, 'conviviality')}">${convScoreText}</span>
+                                    <div class="grid grid-cols-2 gap-6 font-['Space_Mono']">
+                                        <span class="font-bold w-16 text-center bg-black text-white rounded-sm py-1">${matchText}</span>
+                                        <span class="font-bold w-16 text-center py-1 border-2 border-black bg-white">${convScoreText}</span>
                                     </div>
                                 </div>
-                                <div id="comments-assemble-${t.id}" class="hidden text-sm bg-gray-50 border-t border-gray-100 p-4"></div>
+                                <div id="comments-assemble-${t.id}" class="hidden text-sm bg-gray-50 border-t-2 border-black p-4 font-['Space_Mono']"></div>
                             </div>
                         `;
                     }).join('');
 
                     const funcResultEl = document.createElement('div');
                     funcResultEl.innerHTML = `
-                        <div class="flex items-center space-x-2 mb-3 mt-6">
-                            <div style="background-color: ${func.color}" class="w-3 h-3 rounded-full"></div>
-                            <h4 class="font-bold text-gray-700 text-sm uppercase tracking-wide">${func.name}</h4>
+                        <div class="flex items-center space-x-3 mb-4 mt-8 pb-2 border-b-4" style="border-color: ${func.color}">
+                            <div style="background-color: ${func.color}" class="w-4 h-4 border-2 border-black"></div>
+                            <h4 class="font-bold text-black text-lg uppercase tracking-wide font-['Space_Grotesk']">${func.name}</h4>
                         </div>
-                        <div class="space-y-1">${techHTML}</div>
+                        <div class="space-y-4">${techHTML}</div>
                     `;
                     assembleResultsContainer.appendChild(funcResultEl);
                 }
@@ -832,7 +976,6 @@
         const renderEvaluateView = () => {
             renderTechnologyDropdown();
             renderEvaluateFeatures();
-            renderEvaluatePurposes();
             renderConvivialitySliders();
             updateSliderDisplay(evaluateTechSlider, evaluateTechDisplay, 'tech');
             updateSliderDisplay(evaluateSizeSlider, evaluateSizeDisplay, 'size');
@@ -854,35 +997,22 @@
             evaluateFeaturesContainer.innerHTML = allFeatures
                 .filter(feat => feat.name.toLowerCase().includes(lowerCaseSearchTerm))
                 .map(feat => `
-                <label class="flex items-start space-x-2 text-sm p-1 hover:bg-gray-50 rounded cursor-pointer">
-                    <input type="checkbox" value="${feat.id}" class="mt-1 rounded border-gray-300 text-purple-600 focus:ring-purple-500">
-                    <span class="text-gray-700">${feat.name}</span>
+                <label class="flex items-start space-x-2 text-sm p-1 hover:bg-purple-50 rounded cursor-pointer border border-transparent hover:border-black transition-all">
+                    <input type="checkbox" value="${feat.id}" class="feature-checkbox mt-1">
+                    <span class="font-['Space_Mono']">${feat.name}</span>
                 </label>
             `).join('');
         };
         
-        const renderEvaluatePurposes = () => {
-            document.getElementById('evaluate-purposes-container').innerHTML = '';
-            dataService.getPurposes().forEach(purpose => {
-                const purposeHTML = `
-                    <label class="flex items-center space-x-2 text-sm p-1 hover:bg-gray-50 rounded cursor-pointer">
-                        <input type="checkbox" value="${purpose.id}" class="rounded border-gray-300 text-purple-600 focus:ring-purple-500">
-                        <span class="text-gray-700">${purpose.name}</span>
-                    </label>
-                `;
-                document.getElementById('evaluate-purposes-container').innerHTML += purposeHTML;
-            });
-        };
-
         const renderTechnologiesList = (container, viewName) => {
             container.innerHTML = '';
             
             const headerHTML = `
-                 <div class="grid grid-cols-[1fr_auto] gap-4 text-xs text-gray-400 font-bold uppercase tracking-wider mb-4 border-b pb-2">
+                 <div class="grid grid-cols-[1fr_auto] gap-4 text-xs font-bold uppercase tracking-wider mb-4 border-b-2 border-black pb-2 font-['Space_Mono']">
                     <span>Technology</span>
                     <div class="grid grid-cols-2 gap-6">
                         <span class="w-16 text-center">Conviv.</span>
-                        <span class="w-16 text-center">Tech knowledge</span>
+                        <span class="w-16 text-center">Tech Lvl</span>
                     </div>
                 </div>
             `;
@@ -906,29 +1036,29 @@
                         const convScoreText = scores.conviviality !== null ? scores.conviviality.toFixed(1) : '-';
                         const techScoreText = scores.proficiency !== null ? scores.proficiency.toFixed(1) : '-';
                         return `
-                        <div class="bg-white border border-gray-100 rounded-lg shadow-sm mb-2 overflow-hidden hover:shadow-md transition-shadow">
-                            <div class="grid grid-cols-[1fr_auto] gap-4 items-center text-sm p-4">
-                                <div class="flex items-center tech-name-button font-medium text-gray-800" data-tech-id="${t.id}">
-                                    <span class="caret text-gray-400 text-xs">&#9656;</span>
+                        <div class="neo-card mb-4 overflow-hidden">
+                            <div class="grid grid-cols-[1fr_auto] gap-4 items-center text-sm p-4 hover:bg-gray-50 transition-colors">
+                                <div class="flex items-center tech-name-button font-bold text-lg font-['Space_Grotesk']" data-tech-id="${t.id}">
+                                    <span class="caret text-black mr-2">▶</span>
                                     <span>${t.name}</span>
-                                    ${t.isOpenSource ? '<span class="ml-2 px-1.5 py-0.5 rounded text-[10px] font-bold bg-green-100 text-green-700 border border-green-200" title="Open Source">FLOSS</span>' : ''}
+                                    ${t.isOpenSource ? '<span class="ml-2 tag bg-green-200 border-black" title="Open Source">FLOSS</span>' : ''}
                                 </div>
-                                <div class="grid grid-cols-2 gap-6">
-                                   <span class="font-bold w-16 text-center py-1 ${getScoreColor(scores.conviviality, 'conviviality')}">${convScoreText}</span>
-                                   <span class="font-bold w-16 text-center py-1 ${getScoreColor(scores.proficiency, 'tech')}">${techScoreText}</span>
+                                <div class="grid grid-cols-2 gap-6 font-['Space_Mono']">
+                                   <span class="font-bold w-16 text-center py-1 border-2 border-black bg-white">${convScoreText}</span>
+                                   <span class="font-bold w-16 text-center py-1 border-2 border-black bg-white">${techScoreText}</span>
                                 </div>
                             </div>
-                            <div id="comments-${viewName}-${t.id}" class="hidden text-sm bg-gray-50 border-t border-gray-100 p-4"></div>
+                            <div id="comments-${viewName}-${t.id}" class="hidden text-sm bg-gray-50 border-t-2 border-black p-4 font-['Space_Mono']"></div>
                         </div>
                     `}).join('');
                     
                     const funcResultEl = document.createElement('div');
                     funcResultEl.innerHTML = `
-                        <div class="flex items-center space-x-2 mb-3 mt-6">
-                            <div style="background-color: ${func.color}" class="w-3 h-3 rounded-full"></div>
-                            <h4 class="font-bold text-gray-700 text-sm uppercase tracking-wide">${func.name}</h4>
+                        <div class="flex items-center space-x-3 mb-4 mt-8 pb-2 border-b-4" style="border-color: ${func.color}">
+                            <div style="background-color: ${func.color}" class="w-4 h-4 border-2 border-black"></div>
+                            <h4 class="font-bold text-black text-lg uppercase tracking-wide font-['Space_Grotesk']">${func.name}</h4>
                         </div>
-                        <div class="space-y-1">${techHTML}</div>
+                        <div class="space-y-4">${techHTML}</div>
                     `;
                     container.appendChild(funcResultEl);
                 }
@@ -937,33 +1067,49 @@
         
         const renderAdminDashboard = () => {
             adminDashboardContainer.innerHTML = `
-                <div class="space-y-12">
+                <div class="space-y-16">
                     <!-- Functions -->
-                    <div>
-                        <h3 class="text-xl font-bold mb-4 flex items-center"><span class="bg-gray-200 text-gray-700 rounded px-2 py-1 text-xs mr-2">Core</span>Manage Functions</h3>
+                    <div class="neo-card p-6">
+                        <h3 class="text-2xl font-bold mb-6 flex items-center font-['Space_Grotesk'] uppercase border-b-2 border-black pb-2">
+                            <span class="tag bg-black text-white mr-3">Core</span>Manage Functions
+                        </h3>
                         <table class="admin-table">
                             <thead><tr><th>Name</th><th>Color</th><th class="w-40 text-right">Actions</th></tr></thead>
                             <tbody id="admin-functions-body"></tbody>
                         </table>
-                        <form id="add-function-form" class="mt-4 flex space-x-2"><input type="text" placeholder="New function name" class="form-input flex-grow"><button type="submit" class="action-button text-sm !py-2 !px-4">Add</button></form>
+                        <form id="add-function-form" class="mt-6 flex space-x-2">
+                            <input type="text" placeholder="New function name" class="form-input flex-grow">
+                            <button type="submit" class="action-button text-sm !py-2 !px-4">Add</button>
+                        </form>
                     </div>
                     <!-- Features -->
-                    <div>
-                        <h3 class="text-xl font-bold mb-4 flex items-center"><span class="bg-gray-200 text-gray-700 rounded px-2 py-1 text-xs mr-2">Core</span>Manage Features</h3>
+                    <div class="neo-card p-6">
+                        <h3 class="text-2xl font-bold mb-6 flex items-center font-['Space_Grotesk'] uppercase border-b-2 border-black pb-2">
+                            <span class="tag bg-black text-white mr-3">Core</span>Manage Features
+                        </h3>
                         <table class="admin-table">
                             <thead><tr><th>Name</th><th>Function</th><th>Used By</th><th class="w-40 text-right">Actions</th></tr></thead>
                             <tbody id="admin-features-body"></tbody>
                         </table>
-                         <form id="add-feature-form" class="mt-4 flex space-x-2"><input type="text" placeholder="New feature name" class="form-input flex-grow"><select id="add-feature-function-select" class="form-input w-1/3"></select><button type="submit" class="action-button text-sm !py-2 !px-4">Add</button></form>
+                         <form id="add-feature-form" class="mt-6 flex space-x-2">
+                            <input type="text" placeholder="New feature name" class="form-input flex-grow">
+                            <select id="add-feature-function-select" class="form-input w-1/3 border-l-0"></select>
+                            <button type="submit" class="action-button text-sm !py-2 !px-4">Add</button>
+                         </form>
                     </div>
                     <!-- Technologies -->
-                    <div>
-                         <h3 class="text-xl font-bold mb-4 flex items-center"><span class="bg-gray-200 text-gray-700 rounded px-2 py-1 text-xs mr-2">Content</span>Manage Technologies</h3>
+                    <div class="neo-card p-6">
+                         <h3 class="text-2xl font-bold mb-6 flex items-center font-['Space_Grotesk'] uppercase border-b-2 border-black pb-2">
+                            <span class="tag bg-black text-white mr-3">Content</span>Manage Technologies
+                         </h3>
                         <table class="admin-table">
                             <thead><tr><th>Name</th><th>Associated Features</th><th class="w-40 text-right">Actions</th></tr></thead>
                             <tbody id="admin-technologies-body"></tbody>
                         </table>
-                         <form id="add-technology-form" class="mt-4 flex space-x-2"><input type="text" placeholder="New technology name" class="form-input flex-grow"><button type="submit" class="action-button text-sm !py-2 !px-4">Add</button></form>
+                         <form id="add-technology-form" class="mt-6 flex space-x-2">
+                            <input type="text" placeholder="New technology name" class="form-input flex-grow">
+                            <button type="submit" class="action-button text-sm !py-2 !px-4">Add</button>
+                         </form>
                     </div>
                 </div>
             `;
@@ -975,16 +1121,16 @@
             document.getElementById('admin-functions-body').innerHTML = dataService.getFunctions().map(f => `
                 <tr data-id="${f.id}" data-type="function">
                     <td>
-                        <span class="view-mode font-medium">${f.name}</span>
+                        <span class="view-mode font-bold">${f.name}</span>
                         <input type="text" value="${f.name}" class="form-input edit-mode hidden">
                     </td>
                     <td>
-                        <span class="view-mode flex items-center"><div style="background-color:${f.color}" class="w-4 h-4 mr-2 border rounded-full"></div> ${f.color}</span>
-                        <input type="color" value="${f.color}" class="form-input edit-mode hidden h-8 w-16">
+                        <span class="view-mode flex items-center"><div style="background-color:${f.color}" class="w-6 h-6 mr-2 border-2 border-black"></div> <span class="font-mono text-xs">${f.color}</span></span>
+                        <input type="color" value="${f.color}" class="form-input edit-mode hidden h-10 w-20 p-1">
                     </td>
                     <td class="text-right">
-                        <button class="text-blue-600 hover:text-blue-800 text-xs font-semibold mr-3" data-action="edit">Edit</button>
-                        <button class="text-red-500 hover:text-red-700 text-xs font-semibold" data-action="delete">Delete</button>
+                        <button class="text-blue-600 hover:underline font-bold text-xs uppercase mr-3 font-mono" data-action="edit">Edit</button>
+                        <button class="text-red-600 hover:underline font-bold text-xs uppercase font-mono" data-action="delete">Delete</button>
                     </td>
                 </tr>`).join('');
 
@@ -994,22 +1140,22 @@
             document.getElementById('admin-features-body').innerHTML = dataService.getFeatures().map(f => {
                 const functionName = dataService.getFunctions().find(fn => fn.id === f.functionId)?.name || 'N/A';
                 const techList = dataService.getTechnologies().filter(t => getAggregateData(t).features.includes(f.id));
-                const techListHTML = techList.length > 0 ? `<div class="text-xs text-gray-500">${techList.map(t => t.name).join(', ')}</div>` : '<span class="text-xs text-gray-300">Unused</span>';
+                const techListHTML = techList.length > 0 ? `<div class="text-xs font-mono">${techList.map(t => t.name).join(', ')}</div>` : '<span class="text-xs text-gray-400 font-mono italic">Unused</span>';
 
                 return `
                 <tr data-id="${f.id}" data-type="feature">
                     <td>
-                        <span class="view-mode font-medium">${f.name}</span>
+                        <span class="view-mode font-bold">${f.name}</span>
                         <input type="text" value="${f.name}" class="form-input edit-mode hidden">
                     </td>
                     <td>
-                        <span class="view-mode bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs">${functionName}</span>
+                        <span class="view-mode tag bg-gray-100">${functionName}</span>
                         <select class="form-input edit-mode hidden text-sm">${functionOptions.replace(`value="${f.functionId}"`, `value="${f.functionId}" selected`)}</select>
                     </td>
                     <td><div class="view-mode">${techListHTML}</div></td>
                     <td class="text-right">
-                        <button class="text-blue-600 hover:text-blue-800 text-xs font-semibold mr-3" data-action="edit">Edit</button>
-                        <button class="text-red-500 hover:text-red-700 text-xs font-semibold" data-action="delete">Delete</button>
+                        <button class="text-blue-600 hover:underline font-bold text-xs uppercase mr-3 font-mono" data-action="edit">Edit</button>
+                        <button class="text-red-600 hover:underline font-bold text-xs uppercase font-mono" data-action="delete">Delete</button>
                     </td>
                 </tr>`;
             }).join('');
@@ -1017,20 +1163,20 @@
             // Technologies
             document.getElementById('admin-technologies-body').innerHTML = dataService.getTechnologies().map(t => {
                 const aggData = getAggregateData(t);
-                const featureList = `<div class="flex flex-wrap gap-1">${aggData.features.map(fid => `<span class="bg-gray-100 border border-gray-200 text-gray-600 px-2 py-1 rounded text-xs">${dataService.getFeatureById(fid)?.name || ''}</span>`).join('')}</div>`;
+                const featureList = `<div class="flex flex-wrap gap-2">${aggData.features.map(fid => `<span class="tag bg-white hover:bg-gray-100">${dataService.getFeatureById(fid)?.name || ''}</span>`).join('')}</div>`;
                 
                 const unassociatedFeatures = dataService.getFeatures().filter(f => !aggData.features.includes(f.id));
                 const addFeatureContainerHTML = unassociatedFeatures.length > 0 ? `
-                    <div class="add-feature-container flex space-x-2 mt-2 bg-white p-1 rounded border border-gray-200">
-                        <select class="form-input flex-grow text-xs h-8 py-0">${unassociatedFeatures.map(f => `<option value="${f.id}">${f.name}</option>`).join('')}</select>
-                        <button class="text-xs action-button !py-0 !px-3 h-8 flex items-center" data-action="add-feature">Add</button>
+                    <div class="add-feature-container flex space-x-2 mt-2 bg-gray-50 p-2 border-2 border-black border-dashed">
+                        <select class="form-input flex-grow text-xs h-8 py-0 border-black">${unassociatedFeatures.map(f => `<option value="${f.id}">${f.name}</option>`).join('')}</select>
+                        <button class="text-xs action-button !py-0 !px-3 h-8 flex items-center bg-black text-white" data-action="add-feature">Add</button>
                     </div>` : '';
 
                 const editModeFeaturesHTML = `
                     <div class="edit-mode-features-list space-y-1">
                         ${aggData.features.map(fid => {
                             const feature = dataService.getFeatureById(fid);
-                            return feature ? `<div class="edit-mode-item text-xs" data-feature-id="${fid}"><span>${feature.name}</span><button class="text-red-500 hover:text-red-700 font-bold ml-2" data-action="remove-feature">&times;</button></div>` : '';
+                            return feature ? `<div class="edit-mode-item text-xs font-mono bg-white border border-black p-1 flex justify-between items-center" data-feature-id="${fid}"><span>${feature.name}</span><button class="text-red-600 hover:bg-red-600 hover:text-white font-bold ml-2 px-1" data-action="remove-feature">×</button></div>` : '';
                         }).join('')}
                     </div>
                     ${addFeatureContainerHTML}`;
@@ -1038,16 +1184,16 @@
                 return `
                 <tr data-id="${t.id}" data-type="technology">
                     <td>
-                        <span class="view-mode font-bold">${t.name}</span>
+                        <span class="view-mode font-bold text-lg">${t.name}</span>
                         <input type="text" value="${t.name}" class="form-input edit-mode hidden">
                     </td>
                     <td>
-                        <div class="view-mode">${aggData.features.length > 0 ? featureList : '<span class="text-gray-400 italic">No features associated</span>'}</div>
+                        <div class="view-mode">${aggData.features.length > 0 ? featureList : '<span class="text-gray-400 font-mono italic">No features associated</span>'}</div>
                         <div class="edit-mode hidden">${editModeFeaturesHTML}</div>
                     </td>
                     <td class="text-right">
-                        <button class="text-blue-600 hover:text-blue-800 text-xs font-semibold mr-3" data-action="edit">Edit</button>
-                        <button class="text-red-500 hover:text-red-700 text-xs font-semibold" data-action="delete">Delete</button>
+                        <button class="text-blue-600 hover:underline font-bold text-xs uppercase mr-3 font-mono" data-action="edit">Edit</button>
+                        <button class="text-red-600 hover:underline font-bold text-xs uppercase font-mono" data-action="delete">Delete</button>
                     </td>
                 </tr>`;
             }).join('');
@@ -1103,7 +1249,7 @@
             if (action === 'edit') {
                 row.querySelectorAll('.view-mode').forEach(el => el.classList.add('hidden'));
                 row.querySelectorAll('.edit-mode').forEach(el => el.classList.remove('hidden'));
-                target.textContent = 'Save';
+                target.textContent = 'SAVE';
                 target.dataset.action = 'save';
                 target.classList.remove('text-blue-600');
                 target.classList.add('text-green-600');
@@ -1145,9 +1291,9 @@
                 const feature = dataService.getFeatureById(featureId);
                 const list = techRow.querySelector('.edit-mode-features-list');
                 const newItem = document.createElement('div');
-                newItem.className = 'edit-mode-item text-xs';
+                newItem.className = 'edit-mode-item text-xs font-mono bg-white border border-black p-1 flex justify-between items-center';
                 newItem.dataset.featureId = featureId;
-                newItem.innerHTML = `<span>${feature.name}</span><button class="text-red-500 hover:text-red-700 font-bold ml-2" data-action="remove-feature">&times;</button>`;
+                newItem.innerHTML = `<span>${feature.name}</span><button class="text-red-600 hover:bg-red-600 hover:text-white font-bold ml-2 px-1" data-action="remove-feature">×</button>`;
                 list.appendChild(newItem);
                 select.remove(select.selectedIndex);
                 if (select.options.length === 0) {
@@ -1235,15 +1381,6 @@
             renderEvaluateFeatures(e.target.value);
         });
         
-        newPurposeInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && newPurposeInput.value.trim() !== '') {
-                e.preventDefault();
-                dataService.addPurpose(newPurposeInput.value.trim());
-                renderEvaluatePurposes();
-                newPurposeInput.value = '';
-            }
-        });
-        
         saveEvaluationButton.addEventListener('click', () => {
             saveErrorMessage.classList.add('hidden');
             saveConfirmationMessage.classList.add('hidden');
@@ -1265,8 +1402,7 @@
                 groupSize: parseInt(evaluateSizeSlider.value),       // Use slider value
                 convivialityScore: avgConvScore,
                 comment: evaluationComment.value,
-                features: Array.from(document.getElementById('evaluate-features-container').querySelectorAll('input:checked')).map(cb => cb.value),
-                purposes: Array.from(document.getElementById('evaluate-purposes-container').querySelectorAll('input:checked')).map(cb => cb.value),
+                features: Array.from(document.getElementById('evaluate-features-container').querySelectorAll('input:checked')).map(cb => cb.value)
             };
             
             dataService.addEvaluation(techId, newEvaluation);
@@ -1293,7 +1429,6 @@
             evaluateSizeSlider.value = 2; updateSliderDisplay(evaluateSizeSlider, evaluateSizeDisplay, 'size');
 
             renderEvaluateFeatures();
-            renderEvaluatePurposes();
         });
         
         const handleCommentToggle = (event) => {
@@ -1311,23 +1446,23 @@
                      const technology = dataService.getTechnologyById(parseInt(techId));
                      const aggData = getAggregateData(technology);
                      
-                     let featuresHTML = '<p class="font-semibold mb-1">Supported Features:</p>';
+                     let featuresHTML = '<p class="font-bold mb-1 uppercase text-xs">Supported Features:</p>';
                      if (aggData.features.length > 0) {
                          const featureList = aggData.features.map(fid => {
                             const feature = dataService.getFeatureById(fid);
                             return `<li class="ml-4">${feature ? feature.name : 'Unknown feature'}</li>`;
                          }).join('');
-                         featuresHTML += `<ul class="list-disc list-outside mb-4 text-gray-600">${featureList}</ul>`;
+                         featuresHTML += `<ul class="list-disc list-outside mb-4 text-gray-700 font-mono text-xs">${featureList}</ul>`;
                      } else {
-                         featuresHTML += '<p class="text-gray-500 italic mb-4">No features listed.</p>';
+                         featuresHTML += '<p class="text-gray-400 font-mono italic mb-4">No features listed.</p>';
                      }
 
-                     let commentsHTML = '<p class="font-semibold mb-2">User Reviews:</p>';
+                     let commentsHTML = '<p class="font-bold mb-2 uppercase text-xs">User Reviews:</p>';
                      const comments = technology.evaluations.filter(ev => ev.comment && ev.comment.trim() !== '' && !ev.isAdminAssigned);
                      if (comments.length > 0) {
-                        commentsHTML += comments.map(ev => `<div class="bg-white p-3 rounded border border-gray-200 mb-2 italic text-gray-600">"${ev.comment}"</div>`).join('');
+                        commentsHTML += comments.map(ev => `<div class="bg-white p-3 border-2 border-black mb-2 italic text-black shadow-[2px_2px_0px_0px_#000]">"${ev.comment}"</div>`).join('');
                      } else {
-                        commentsHTML += '<p class="text-gray-500 italic">No comments yet.</p>';
+                        commentsHTML += '<p class="text-gray-400 font-mono italic">No comments yet.</p>';
                      }
 
                      commentsContainer.innerHTML = featuresHTML + commentsHTML;
