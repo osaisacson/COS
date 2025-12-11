@@ -47,6 +47,10 @@
         .slider-container { padding: 1rem; background-color: #f9fafb; border-radius: 0.5rem; border: 1px solid #e5e7eb; margin-bottom: 1.5rem; }
         .slider-label { font-size: 0.75rem; color: #6b7280; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; display: block; }
         .slider-value-display { font-size: 0.875rem; font-weight: 600; color: #1f2937; margin-top: 0.25rem; }
+        
+        /* Logo Styles */
+        .logo-bubble { position: absolute; border-radius: 50%; mix-blend-mode: multiply; opacity: 0.7; transition: all 0.3s ease; }
+        .logo-bubble:hover { opacity: 1; transform: scale(1.1); z-index: 10; }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(5px); }
@@ -61,15 +65,13 @@
 
     <div class="container mx-auto p-4 md:p-8 max-w-6xl flex-grow">
         <header class="flex flex-col md:flex-row justify-between items-center py-6 border-b border-gray-100 mb-8">
-            <div id="home-logo" class="h-10 w-10 grid grid-cols-2 grid-rows-2 gap-1 cursor-pointer transition-transform hover:scale-105 mb-4 md:mb-0">
-                <span class="bg-pink-400 rounded-sm"></span><span class="bg-blue-400 rounded-sm"></span>
-                <span class="bg-yellow-400 rounded-sm"></span><span class="bg-purple-400 rounded-sm"></span>
+            <div id="home-logo" class="h-16 w-16 relative cursor-pointer mb-4 md:mb-0" title="Functions scaled by feature count">
+                <!-- SVG/Bubbles injected by JS -->
             </div>
             <nav class="flex flex-wrap justify-center space-x-6 text-sm font-medium text-gray-500">
+                <a href="#assemble" class="nav-link hover:text-black transition-colors">Assemble</a>
+                <a href="#evaluate" class="nav-link hover:text-black transition-colors">Evaluate</a>
                 <a href="#technologies" class="nav-link hover:text-black transition-colors">All technologies</a>
-                <a href="#functions" class="nav-link hover:text-black transition-colors">Supported functions</a>
-                <a href="#why" class="nav-link hover:text-black transition-colors">Why is this needed</a>
-                <a href="#about" class="nav-link hover:text-black transition-colors">About</a>
             </nav>
         </header>
 
@@ -110,8 +112,17 @@
                 <div class="md:border-r md:border-gray-200 md:pr-12">
                     <div class="sticky top-4">
                         <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Your Group</h3>
+                        
+                        <div class="mb-6 p-4 bg-teal-50 border border-teal-100 rounded-lg">
+                            <label class="flex items-center space-x-3 cursor-pointer">
+                                <input type="checkbox" id="assemble-floss-filter" class="feature-checkbox h-5 w-5 text-teal-600 rounded">
+                                <span class="text-sm font-bold text-teal-900">Strictly Open Source</span>
+                            </label>
+                            <p class="text-xs text-teal-600 mt-1 ml-8">Only show Fully Free/Libre Open Source technologies.</p>
+                        </div>
+
                         <div class="slider-container">
-                            <label class="slider-label">Tech knowledge</label>
+                            <label class="slider-label">Technology knowledge</label>
                             <input type="range" id="assemble-tech-slider" min="1" max="5" step="1" value="3">
                             <div id="assemble-tech-display" class="slider-value-display">Comfortable with new software</div>
                         </div>
@@ -138,7 +149,7 @@
         <section id="evaluate-page" class="page-content">
              <div class="max-w-2xl mx-auto">
                 <h2 class="text-3xl font-bold mb-2">Evaluation</h2>
-                <p class="text-gray-500 mb-8">Contribute to the commons by reviewing a tool.</p>
+                <p class="text-gray-500 mb-8">Contribute to the commons by reviewing a technology.</p>
                 
                 <div id="evaluate-form-container" class="space-y-6 bg-gray-50 p-8 rounded-xl border border-gray-100">
                     <div>
@@ -149,7 +160,7 @@
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                          <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Required Proficiency</label>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Required technology knowledge</label>
                             <div class="bg-white p-3 border rounded">
                                 <input type="range" id="evaluate-tech-slider" min="1" max="5" step="1" value="3" class="w-full">
                                 <div id="evaluate-tech-display" class="text-xs text-center font-bold mt-1 text-purple-600">Comfortable with new software</div>
@@ -199,67 +210,6 @@
              <div id="technologies-list-container" class="space-y-12"></div>
         </section>
 
-        <section id="functions-page" class="page-content">
-            <h2 class="text-3xl font-bold mb-8">Supported Functions</h2>
-            <div class="grid md:grid-cols-2 gap-8 text-gray-700">
-                <div class="bg-gray-50 p-6 rounded-xl border border-gray-100">
-                    <h2 class="text-xl font-bold mb-3 text-gray-900">Communication</h2>
-                    <p class="text-sm leading-relaxed">Effective communication is the bedrock of any collaborative group. For countercultures, this means creating spaces for dialogue that are secure, transparent, and owned by the community itself, rather than relying on platforms that may exploit user data. Supporting this function allows groups to find and connect with like-minded people, coordinate projects, and build trust without compromising their values.</p>
-                </div>
-                <div class="bg-gray-50 p-6 rounded-xl border border-gray-100">
-                    <h2 class="text-xl font-bold mb-3 text-gray-900">Planning</h2>
-                    <p class="text-sm leading-relaxed">Coordination is vital for groups to turn ideas into reality. This function covers the logistics of coming together—scheduling meetings, making collective decisions, and visualizing timelines. By using convivial tools for planning, groups can ensure that their processes remain democratic and inclusive, avoiding the pitfalls of top-down management software.</p>
-                </div>
-                <div class="bg-gray-50 p-6 rounded-xl border border-gray-100">
-                    <h2 class="text-xl font-bold mb-3 text-gray-900">Economy</h2>
-                    <p class="text-sm leading-relaxed">Moving beyond the growth paradigm requires creating alternative economic models. This function supports groups in managing shared finances, creating community currencies, and developing systems of value that reflect their principles, such as rewarding contributions rather than accumulating capital. Technologies that support this function are crucial for building economic resilience and autonomy.</p>
-                </div>
-                <div class="bg-gray-50 p-6 rounded-xl border border-gray-100">
-                    <h2 class="text-xl font-bold mb-3 text-gray-900">Admin & Organisation</h2>
-                    <p class="text-sm leading-relaxed">Self-organisation is a core tenet of many alternative groups, but it can be logistically challenging. This function is about providing tools that reduce the burden of administration—the "unpaid jobs" that can lead to burnout. By simplifying task tracking, decision-making, and coordination, these technologies free up time and energy for the "heart work" that truly builds community.</p>
-                </div>
-                 <div class="bg-gray-50 p-6 rounded-xl border border-gray-100">
-                    <h2 class="text-xl font-bold mb-3 text-gray-900">Commons</h2>
-                    <p class="text-sm leading-relaxed">The concept of the commons—shared resources managed collectively—is central to post-growth thinking. This function supports the management of both digital commons (like open-source knowledge) and physical commons (like tools, land, or shared spaces). It enables groups to bypass traditional ownership models and create systems of access and stewardship that are equitable and sustainable.</p>
-                </div>
-                <div class="bg-gray-50 p-6 rounded-xl border border-gray-100">
-                    <h2 class="text-xl font-bold mb-3 text-gray-900">Connection</h2>
-                    <p class="text-sm leading-relaxed">This function relates to building a shared identity and knowledge base. For countercultures to thrive and evolve, they need ways to document their learnings, share them with others, and build upon a collective intelligence. Supporting this function helps create resilient networks of groups that can learn from each other, fostering a broader movement of transformative change.</p>
-                </div>
-            </div>
-        </section>
-
-        <section id="why-page" class="page-content">
-            <div class="max-w-3xl mx-auto">
-                <h2 class="text-3xl font-bold mb-6">Why is this Needed?</h2>
-                <div class="space-y-6 text-gray-700 leading-relaxed text-lg font-light">
-                    <p>If a transformative system change is needed to transition to sustainable patterns, then efforts must be focused on defining what change we wish to achieve, who is actually in a position to implement this change, and how they may go about doing so. The current dominant paradigm of perpetual economic growth is increasingly criticized for being both a cause of and a barrier to solving our most pressing social and environmental crises.</p>
-                    <p>This project is motivated by an understanding that the society we are currently living in is influenced by a new spirit of capitalism that tends to absorb critiques without making fundamental changes. The direction we are heading towards seems balanced either towards continued growth—which would be detrimental to civilization as we know it—or towards post-growth, which requires transformative change efforts.</p>
-                    <div class="border-l-4 border-blue-400 pl-6 py-2 italic text-gray-600">
-                        This work positions <strong>alternative groups</strong>—intentional communities, collectives, and associations—as pivotal actors in implementing a diversity of post-growth futures. Unlike top-down approaches, these groups are already living the change, acting as radical laboratories for sustainable transformation.
-                    </div>
-                    <p>Digital technology presents an ambiguous potential. While often used to extract value and control users in what has been termed "platform capitalism," it can also be appropriated to support autonomy, collaboration, and self-organisation. This project explores how to provide a scaffolding for alternative groups to translate their ideas into practice, empowering them to build a collection of futures that experiment with different forms of convivial life.</p>
-                </div>
-            </div>
-        </section>
-
-        <section id="about-page" class="page-content">
-             <div class="max-w-3xl mx-auto">
-                 <h2 class="text-3xl font-bold mb-6">About the Project</h2>
-                 <div class="space-y-6 text-gray-700 leading-relaxed">
-                    <p>This project, titled <strong>"Empowering radical laboratories of change - Digital structures for alternative groups,"</strong> explores how technologies can support alternative groups in implementing post-growth practices. It stems from a journey through architecture, international development, and software engineering, which revealed a common challenge: the structures that shape our lives, whether physical or digital, often serve a system of perpetual growth that is fundamentally unsustainable.</p>
-                    <p>Disillusioned with both top-down change and the value-extractive nature of startup culture, the focus turned to those working in parallel with the dominant system: alternative groups. These groups are actively defining and living the change they wish to see, offering a rare sense of hope for the future.</p>
-                    <p>The central research question is: <strong>How can technologies support alternative groups implementing post-growth in practice?</strong></p>
-                    <p>To answer this, the research moves from theory to practice:</p>
-                    <ul class="list-disc list-outside ml-6 space-y-2 marker:text-blue-400">
-                        <li><strong>Exploring the Tools:</strong> Mapping the landscape of post-2004 technologies (like collaborative commons and decentralised production) that could be useful for post-growth aims.</li>
-                        <li><strong>Understanding the Actors:</strong> Interviewing members of an alternative group to understand their context, needs, and the real-world barriers to adopting new technologies.</li>
-                        <li><strong>Building the Bridge:</strong> This application, the Convivial Operating Stack (COS), is the synthesis of that research—a practical tool designed to help groups find, evaluate, and assemble their own set of supportive, value-aligned technologies.</li>
-                    </ul>
-                 </div>
-             </div>
-        </section>
-        
         <section id="admin-login-page" class="page-content">
             <div class="max-w-md mx-auto mt-12 bg-gray-50 p-8 rounded-xl border border-gray-100">
                 <h2 class="text-2xl font-bold mb-6 text-center">Admin Login</h2>
@@ -298,46 +248,57 @@
     document.addEventListener('DOMContentLoaded', () => {
         // --- DATA ---
         const appData = {
-            version: 1.3,
+            version: 1.6,
+            // Colors: Magenta, Purple, Teal, Yellow
             functions: [
-                { id: 'comm', name: 'Communication', color: '#facc15', accent: 'accent-yellow-400' },
-                { id: 'plan', name: 'Planning', color: '#fb923c', accent: 'accent-orange-400' },
-                { id: 'econ', name: 'Economy', color: '#f472b6', accent: 'accent-pink-400' },
-                { id: 'admin', name: 'Admin', color: '#a78bfa', accent: 'accent-purple-400' },
-                { id: 'commons', name: 'Commons', color: '#60a5fa', accent: 'accent-blue-400' },
-                { id: 'conn', name: 'Connection', color: '#4ade80', accent: 'accent-green-400' },
+                { id: 'commons', name: 'Collaborative Commons', color: '#db2777', accent: 'accent-pink-600' }, // Magenta (pink-600)
+                { id: 'admin', name: 'Assisted Administration', color: '#9333ea', accent: 'accent-purple-600' }, // Purple (purple-600)
+                { id: 'production', name: 'Peer Production', color: '#0d9488', accent: 'accent-teal-600' }, // Teal (teal-600)
+                { id: 'economy', name: 'Egalitarian Economy', color: '#ca8a04', accent: 'accent-yellow-600' }, // Yellow (yellow-600 - darker for text contrast)
             ],
+            // Features mapped to the new 4 functions
             features: [
-                {id: 'f1', name: 'Find and connect with others interested in the group', functionId: 'comm'},
-                {id: 'f2', name: 'Communicate around projects and events', functionId: 'comm'},
-                {id: 'f3', name: 'Brainstorm around an idea and work on it together', functionId: 'comm'},
-                {id: 'f4', name: 'Manage shared finances', functionId: 'econ'},
-                {id: 'f5', name: 'Create and manage budgets', functionId: 'econ'},
+                // Collaborative Commons (Communication, Decisions, Knowledge, Connection)
+                {id: 'f1', name: 'Find and connect with others', functionId: 'commons'},
+                {id: 'f2', name: 'Communicate around projects', functionId: 'commons'},
+                {id: 'f3', name: 'Brainstorm ideas together', functionId: 'commons'},
+                {id: 'f9', name: 'Build a shared knowledge base', functionId: 'commons'},
+                {id: 'f_save', name: 'Save web content for later', functionId: 'commons'},
+                {id: 'f_blog', name: 'Publish news or a blog', functionId: 'commons'},
+                {id: 'f_event', name: 'Organize events', functionId: 'commons'},
+                {id: 'f_plan1', name: 'Agree on meeting dates', functionId: 'commons'},
+                {id: 'f_decide', name: 'Make collective decisions', functionId: 'commons'},
+                {id: 'f_map', name: 'Create mind maps', functionId: 'commons'},
+
+                // Assisted Administration (Org, Tasks, Forms)
                 {id: 'f6', name: 'Track tasks and projects', functionId: 'admin'},
-                {id: 'f7', name: 'Store and share documents', functionId: 'admin'},
-                {id: 'f8', name: 'Book shared resources', functionId: 'commons'},
-                {id: 'f9', name: 'Build a shared knowledge base', functionId: 'conn'},
-                {id: 'f10', name: 'Distributing the weight of administration', functionId: 'admin'},
-                {id: 'f11', name: 'Gathering important information in one place', functionId: 'admin'},
-                {id: 'f12', name: 'Handle reimbursement of expenses', functionId: 'admin'},
-                {id: 'f13', name: 'Handling all membership fees', functionId: 'admin'},
-                {id: 'f14', name: 'Manage and get funding for events', functionId: 'admin'},
-                {id: 'f15', name: 'Receive funding from outside sources', functionId: 'admin'},
-                // New features for Framasoft/Planning
-                {id: 'f_plan1', name: 'Agree on a date for a meeting or event', functionId: 'plan'},
-                {id: 'f_write', name: 'Real-time collaborative writing', functionId: 'commons'},
-                {id: 'f_calc', name: 'Collaborative spreadsheets', functionId: 'econ'},
-                {id: 'f_decide', name: 'Make collective decisions', functionId: 'plan'},
-                {id: 'f_form', name: 'Create online forms and surveys', functionId: 'admin'},
-                {id: 'f_map', name: 'Create mind maps', functionId: 'plan'},
-                {id: 'f_event', name: 'Organize events without commercial platforms', functionId: 'comm'},
-                {id: 'f_git', name: 'Host and version control code', functionId: 'commons'},
+                {id: 'f7', name: 'Store and organize documents', functionId: 'admin'},
+                {id: 'f10', name: 'Distribute admin tasks', functionId: 'admin'},
+                {id: 'f11', name: 'Gather information (Forms)', functionId: 'admin'},
+                {id: 'f_form', name: 'Create online forms', functionId: 'admin'},
+                {id: 'f_kanban', name: 'Visual task boards (Kanban)', functionId: 'admin'},
+
+                // Peer Production (Making things: Code, Design, Text, Resources)
+                {id: 'f8', name: 'Book shared resources/tools', functionId: 'production'},
+                {id: 'f_write', name: 'Collaborative writing', functionId: 'production'},
+                {id: 'f_git', name: 'Host and version code', functionId: 'production'},
+                {id: 'f_video', name: 'Host and share videos', functionId: 'production'},
+                {id: 'f_3d', name: 'Share 3D designs', functionId: 'production'},
+
+                // Egalitarian Economy (Money, Value)
+                {id: 'f4', name: 'Manage shared finances', functionId: 'economy'},
+                {id: 'f5', name: 'Create and manage budgets', functionId: 'economy'},
+                {id: 'f_calc', name: 'Collaborative spreadsheets', functionId: 'economy'},
+                {id: 'f12', name: 'Handle expense reimbursements', functionId: 'economy'},
+                {id: 'f13', name: 'Manage membership fees', functionId: 'economy'},
+                {id: 'f14', name: 'Funding for events', functionId: 'economy'},
+                {id: 'f15', name: 'Receive outside funding', functionId: 'economy'},
             ],
             techProficiencyLevels: [
                 { id: 1, name: 'Happy luddites' },
-                { id: 2, name: 'Basic tool users (email, social media)' },
+                { id: 2, name: 'Basic technology users (email, social media)' },
                 { id: 3, name: 'Comfortable with new software' },
-                { id: 4, name: 'Some tech experts in the group' },
+                { id: 4, name: 'Some technology experts in the group' },
                 { id: 5, name: 'Able to code' },
             ],
             groupSizes: [
@@ -348,57 +309,73 @@
                 { id: 5, name: 'Movement (200+)' },
             ],
             technologies: [
-                { id: 1, name: 'Discord', evaluations: [
+                { id: 1, name: 'Discord', isOpenSource: false, evaluations: [
                     { techProficiency: 3, groupSize: 4, convivialityScore: 2.5, comment: "Great for quick chats, but can be overwhelming and extractive.", features: ['f1', 'f2'], purposes: ['p1'] },
                 ]},
-                { id: 2, name: 'WhatsApp', evaluations: [
+                { id: 2, name: 'WhatsApp', isOpenSource: false, evaluations: [
                      { techProficiency: 1, groupSize: 2, convivialityScore: 1.5, comment: "Super easy to use, but owned by Meta. Privacy concerns.", features: ['f1', 'f2'], purposes: ['p1'] }
                 ]},
-                { id: 3, name: 'Open Collective', evaluations: [
+                { id: 3, name: 'Open Collective', isOpenSource: true, evaluations: [
                     { techProficiency: 2, groupSize: 3, convivialityScore: 9.2, comment: "A game-changer for transparent finances and reducing admin load.", features: ['f10', 'f11', 'f12', 'f13', 'f14', 'f15', 'f4', 'f5'], purposes: ['p2'] }
                 ] },
-                { id: 4, name: 'Trello', evaluations: [
-                    { techProficiency: 2, groupSize: 2, convivialityScore: 3.0, comment: "Visual and intuitive, but proprietary software.", features: ['f6'], purposes: ['p1', 'p2'] }
+                { id: 4, name: 'Trello', isOpenSource: false, evaluations: [
+                    { techProficiency: 2, groupSize: 2, convivialityScore: 3.0, comment: "Visual and intuitive, but proprietary software.", features: ['f6', 'f_kanban'], purposes: ['p1', 'p2'] }
                 ]},
-                { id: 5, name: 'Facebook', evaluations: [
+                { id: 5, name: 'Facebook', isOpenSource: false, evaluations: [
                     { techProficiency: 4, groupSize: 5, convivialityScore: 1.0, comment: "Feels invasive and constantly tries to sell you things. Hard to control your own data.", features: ['f1', 'f2'], purposes: ['p1'] }
                 ]},
                 // Framasoft Suite
-                { id: 6, name: 'Framadate', evaluations: [
+                { id: 6, name: 'Framadate', isOpenSource: true, evaluations: [
                     { techProficiency: 1, groupSize: 2, convivialityScore: 9.8, comment: "Simple, ethical scheduling without ads.", features: ['f_plan1'], purposes: ['p1'] }
                 ]},
-                { id: 7, name: 'Framapad', evaluations: [
+                { id: 7, name: 'Framapad', isOpenSource: true, evaluations: [
                     { techProficiency: 2, groupSize: 2, convivialityScore: 9.5, comment: "Excellent for taking minutes together in real time.", features: ['f_write', 'f3'], purposes: ['p1'] }
                 ]},
-                { id: 8, name: 'Framacalc', evaluations: [
+                { id: 8, name: 'Framacalc', isOpenSource: true, evaluations: [
                     { techProficiency: 2, groupSize: 2, convivialityScore: 9.0, comment: "Like Excel but online and collaborative. Very useful.", features: ['f_calc', 'f4', 'f5'], purposes: ['p2'] }
                 ]},
-                { id: 9, name: 'Framavox', evaluations: [
+                { id: 9, name: 'Framavox', isOpenSource: true, evaluations: [
                     { techProficiency: 3, groupSize: 3, convivialityScore: 8.8, comment: "Great for Loomio-style decision making.", features: ['f_decide', 'f3'], purposes: ['p1'] }
                 ]},
-                { id: 10, name: 'Framaforms', evaluations: [
+                { id: 10, name: 'Framaforms', isOpenSource: true, evaluations: [
                     { techProficiency: 2, groupSize: 4, convivialityScore: 9.2, comment: "Drag and drop form builder, respectful of privacy.", features: ['f_form', 'f11'], purposes: ['p1'] }
                 ]},
-                { id: 11, name: 'Framamind', evaluations: [
+                { id: 11, name: 'Framamind', isOpenSource: true, evaluations: [
                     { techProficiency: 2, groupSize: 2, convivialityScore: 8.5, comment: "Good for initial brainstorming sessions.", features: ['f_map', 'f3'], purposes: ['p1'] }
                 ]},
-                { id: 12, name: 'Mobilizon', evaluations: [
+                { id: 12, name: 'Mobilizon', isOpenSource: true, evaluations: [
                     { techProficiency: 3, groupSize: 4, convivialityScore: 9.2, comment: "A powerful alternative to Facebook Events.", features: ['f_event', 'f1', 'f2'], purposes: ['p1'] }
                 ]},
-                { id: 13, name: 'Framagit', evaluations: [
+                { id: 13, name: 'Framagit', isOpenSource: true, evaluations: [
                     { techProficiency: 4, groupSize: 3, convivialityScore: 9.0, comment: "Essential for sharing code and open source projects.", features: ['f_git', 'f7'], purposes: ['p3'] }
                 ]},
-                { id: 14, name: 'Framatalk', evaluations: [
+                { id: 14, name: 'Framatalk', isOpenSource: true, evaluations: [
                     { techProficiency: 2, groupSize: 1, convivialityScore: 8.5, comment: "Video conferencing that just works in the browser.", features: ['f2'], purposes: ['p1'] }
                 ]},
-                { id: 15, name: 'Framaspace', evaluations: [
+                { id: 15, name: 'Framaspace', isOpenSource: true, evaluations: [
                     { techProficiency: 3, groupSize: 3, convivialityScore: 9.5, comment: "Complete cloud storage and collaboration suite based on Nextcloud.", features: ['f7', 'f2', 'f11'], purposes: ['p1'] }
                 ]},
-                { id: 16, name: 'Framalistes', evaluations: [
+                { id: 16, name: 'Framalistes', isOpenSource: true, evaluations: [
                     { techProficiency: 2, groupSize: 4, convivialityScore: 9.0, comment: "Classic email lists for group coordination.", features: ['f2'], purposes: ['p1'] }
                 ]},
-                { id: 17, name: 'Framateam', evaluations: [
+                { id: 17, name: 'Framateam', isOpenSource: true, evaluations: [
                     { techProficiency: 3, groupSize: 3, convivialityScore: 9.0, comment: "Team chat alternative to Slack/Discord.", features: ['f1', 'f2'], purposes: ['p1'] }
+                ]},
+                { id: 18, name: 'Framaboard', isOpenSource: true, evaluations: [
+                    { techProficiency: 2, groupSize: 2, convivialityScore: 9.0, comment: "Kanban board for task management. Alternative to Trello.", features: ['f6', 'f_kanban'], purposes: ['p1'] }
+                ]},
+                { id: 19, name: 'Framabag', isOpenSource: true, evaluations: [
+                    { techProficiency: 2, groupSize: 1, convivialityScore: 9.2, comment: "Save web pages to read later. Alternative to Pocket.", features: ['f_save', 'f11'], purposes: ['p1'] }
+                ]},
+                { id: 20, name: 'PeerTube', isOpenSource: true, evaluations: [
+                    { techProficiency: 4, groupSize: 4, convivialityScore: 9.5, comment: "Decentralized video hosting platform. Alternative to YouTube.", features: ['f_video', 'f7'], purposes: ['p1'] }
+                ]},
+                { id: 21, name: 'Framablog', isOpenSource: true, evaluations: [
+                    { techProficiency: 3, groupSize: 3, convivialityScore: 9.0, comment: "Lightweight blog to share news.", features: ['f_blog', 'f1'], purposes: ['p1'] }
+                ]},
+                // Added Thingiverse
+                { id: 22, name: 'Thingiverse', isOpenSource: false, evaluations: [
+                    { techProficiency: 3, groupSize: 5, convivialityScore: 4.0, comment: "Massive library of 3D designs, but corporate-owned.", features: ['f_3d'], purposes: ['p1'] }
                 ]}
             ],
             purposes: [
@@ -430,15 +407,17 @@
             
             // ADDERS
             addFunction: (name) => {
-                const colors = ['#facc15', '#f472b6', '#a78bfa', '#60a5fa', '#4ade80', '#f87171', '#818cf8'];
-                const accents = ['accent-yellow-400', 'accent-pink-400', 'accent-purple-400', 'accent-blue-400', 'accent-green-400', 'accent-red-400', 'accent-indigo-400'];
+                const colors = ['#db2777', '#9333ea', '#0d9488', '#ca8a04'];
+                const accents = ['accent-pink-600', 'accent-purple-600', 'accent-teal-600', 'accent-yellow-600'];
                 const nextColorIndex = appData.functions.length % colors.length;
                 const newFunc = { id: `func${Date.now()}`, name, color: colors[nextColorIndex], accent: accents[nextColorIndex] };
                 appData.functions.push(newFunc);
+                renderLogo(); // Re-render logo on change
             },
             addFeature: (name, functionId) => {
                 const newFeature = { id: `f${Date.now()}`, name, functionId, isNew: true };
                 appData.features.push(newFeature);
+                renderLogo(); // Re-render logo on change
             },
             addTechnology: (name) => {
                 const newTech = { id: Date.now(), name, evaluations: [] };
@@ -474,6 +453,7 @@
                     feature.name = newName;
                     feature.functionId = newFunctionId;
                 }
+                renderLogo(); // Re-render logo on change
             },
             updateTechnology: (id, newName, featureIds) => {
                 const tech = appData.technologies.find(t => t.id == id);
@@ -512,9 +492,11 @@
             deleteFunction: (id) => {
                 appData.functions = appData.functions.filter(f => f.id != id);
                 appData.features = appData.features.filter(f => f.functionId != id);
+                renderLogo(); // Re-render logo on change
             },
             deleteFeature: (id) => {
                 appData.features = appData.features.filter(f => f.id != id);
+                renderLogo(); // Re-render logo on change
             },
             deleteTechnology: (id) => {
                 appData.technologies = appData.technologies.filter(t => t.id != id);
@@ -561,6 +543,8 @@
         const evaluateSizeSlider = document.getElementById('evaluate-size-slider');
         const evaluateTechDisplay = document.getElementById('evaluate-tech-display');
         const evaluateSizeDisplay = document.getElementById('evaluate-size-display');
+        
+        const assembleFlossFilter = document.getElementById('assemble-floss-filter');
 
 
         // --- HELPERS ---
@@ -615,6 +599,46 @@
                 const level = dataService.getGroupSizes().find(l => l.id === val);
                 display.textContent = level ? level.name : '';
             }
+        };
+
+        const renderLogo = () => {
+            const container = document.getElementById('home-logo');
+            if (!container) return;
+            container.innerHTML = '';
+            
+            const funcs = dataService.getFunctions();
+            // Count features per function
+            const counts = funcs.map(func => {
+                const count = dataService.getFeaturesByFunction(func.id).length;
+                return { ...func, count: Math.max(count, 1) }; // Min size 1
+            });
+            
+            // Venn Diagram Logic (Simplified for CSS)
+            // We place them in a circle
+            const radius = 25; // radius of the circle of centers
+            const center = 50; // center of container (percentage)
+            
+            counts.forEach((func, index) => {
+                const angle = (index / counts.length) * 2 * Math.PI;
+                const x = center + radius * Math.cos(angle);
+                const y = center + radius * Math.sin(angle);
+                
+                // Scale bubble size based on feature count
+                // Base size 30%, max additional based on count relative to total
+                const size = 30 + (func.count * 2.5); 
+                
+                const bubble = document.createElement('div');
+                bubble.className = 'logo-bubble shadow-sm';
+                bubble.style.backgroundColor = func.color;
+                bubble.style.left = `${x}%`;
+                bubble.style.top = `${y}%`;
+                bubble.style.width = `${size}%`;
+                bubble.style.height = `${size}%`;
+                bubble.style.transform = 'translate(-50%, -50%)'; // Center on coordinate
+                bubble.title = `${func.name}: ${func.count} features`;
+                
+                container.appendChild(bubble);
+            });
         };
 
         // --- STATE MANAGEMENT ---
@@ -703,6 +727,7 @@
             // Get constraints
             const maxProficiency = parseInt(assembleTechSlider.value);
             const targetGroupSize = parseInt(assembleSizeSlider.value);
+            const strictlyOpenSource = assembleFlossFilter.checked;
 
             if (selectedFeatureIds.length === 0) {
                  assembleResultsContainer.innerHTML = `
@@ -720,12 +745,14 @@
                 }, 0);
                 
                 // FILTERING LOGIC
-                // 1. Tech Proficiency: Exclude if tool is harder (higher value) than user's max proficiency
-                if (aggData.proficiency && aggData.proficiency > maxProficiency + 0.5) return null; // Small buffer
+                // 1. Tech Proficiency
+                if (aggData.proficiency && aggData.proficiency > maxProficiency + 0.5) return null;
 
-                // 2. Group Size: Exclude if tool is optimized for a size way off from target
-                // We'll allow a range of +/- 1. E.g. if target is 3, allow 2, 3, 4.
+                // 2. Group Size
                 if (aggData.groupSize && Math.abs(aggData.groupSize - targetGroupSize) > 1.5) return null;
+                
+                // 3. Strictly Open Source
+                if (strictlyOpenSource && !tech.isOpenSource) return null;
 
                 return { ...tech, matchScore, aggData };
             }).filter(tech => tech && tech.matchScore > 0);
@@ -745,7 +772,7 @@
                  assembleResultsContainer.innerHTML = `
                     <div class="p-6 bg-yellow-50 text-yellow-800 rounded-lg border border-yellow-100">
                         <h4 class="font-bold mb-2">No matches found</h4>
-                        <p class="text-sm">Try increasing your <strong>Tech Proficiency</strong> slider or adjusting the <strong>Group Size</strong> to see more options.</p>
+                        <p class="text-sm">Try increasing your <strong>Technology knowledge</strong> slider or adjusting the <strong>Group Size</strong> to see more options.${strictlyOpenSource ? '<br>You can also try unchecking "Strictly Open Source".' : ''}</p>
                     </div>`;
                  return;
             }
@@ -776,6 +803,7 @@
                                     <div class="flex items-center tech-name-button font-medium text-gray-800" data-tech-id="${t.id}">
                                         <span class="caret text-gray-400 text-xs">&#9656;</span>
                                         <span>${t.name}</span>
+                                        ${t.isOpenSource ? '<span class="ml-2 px-1.5 py-0.5 rounded text-[10px] font-bold bg-green-100 text-green-700 border border-green-200" title="Open Source">FLOSS</span>' : ''}
                                     </div>
                                     <div class="grid grid-cols-2 gap-6">
                                         <span class="font-bold w-16 text-center text-blue-500 bg-blue-50 rounded py-1">${matchText}</span>
@@ -853,7 +881,7 @@
                     <span>Technology</span>
                     <div class="grid grid-cols-2 gap-6">
                         <span class="w-16 text-center">Conviv.</span>
-                        <span class="w-16 text-center">Tech Lvl</span>
+                        <span class="w-16 text-center">Tech knowledge</span>
                     </div>
                 </div>
             `;
@@ -882,6 +910,7 @@
                                 <div class="flex items-center tech-name-button font-medium text-gray-800" data-tech-id="${t.id}">
                                     <span class="caret text-gray-400 text-xs">&#9656;</span>
                                     <span>${t.name}</span>
+                                    ${t.isOpenSource ? '<span class="ml-2 px-1.5 py-0.5 rounded text-[10px] font-bold bg-green-100 text-green-700 border border-green-200" title="Open Source">FLOSS</span>' : ''}
                                 </div>
                                 <div class="grid grid-cols-2 gap-6">
                                    <span class="font-bold w-16 text-center py-1 ${getScoreColor(scores.conviviality, 'conviviality')}">${convScoreText}</span>
@@ -1176,6 +1205,12 @@
              const selectedIds = Array.from(selectedCheckboxes).map(cb => cb.value);
              renderAssembleResults(selectedIds);
         });
+        
+        assembleFlossFilter.addEventListener('change', () => {
+             const selectedCheckboxes = assembleFeaturesContainer.querySelectorAll('input[type="checkbox"]:checked');
+             const selectedIds = Array.from(selectedCheckboxes).map(cb => cb.value);
+             renderAssembleResults(selectedIds);
+        });
 
         evaluateTechSlider.addEventListener('input', () => {
              updateSliderDisplay(evaluateTechSlider, evaluateTechDisplay, 'tech');
@@ -1314,6 +1349,7 @@
         window.addEventListener('hashchange', handleRouting);
         handleRouting(); // Initial page load
         updateVersionTracker();
+        renderLogo(); // Render initial logo
     });
     </script>
 </body>
