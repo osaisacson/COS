@@ -221,6 +221,31 @@
 
         .new-flag { background-color: #22c55e; color: black; border-color: black; }
 
+        /* Function Selector Tabs */
+        .function-tab {
+            border: 2px solid black;
+            padding: 10px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s;
+            opacity: 0.6;
+            background: white;
+            box-shadow: 2px 2px 0px 0px #ccc;
+        }
+        .function-tab:hover {
+            opacity: 1;
+            transform: translateY(-2px);
+            box-shadow: 4px 4px 0px 0px #000;
+        }
+        .function-tab.active {
+            opacity: 1;
+            background-color: black;
+            color: white;
+            box-shadow: 4px 4px 0px 0px #000;
+        }
+        
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(5px); }
             to { opacity: 1; transform: translateY(0); }
@@ -325,9 +350,12 @@
                 
                 <div id="evaluate-form-container" class="space-y-8 bg-white p-8 border-[3px] border-black shadow-[8px_8px_0px_0px_#000]">
                     <div>
-                        <label class="block text-sm font-bold font-['Space_Mono'] uppercase mb-2">Technology</label>
-                        <select id="evaluate-tech-select" class="form-input"></select>
-                        <input type="text" id="new-technology-input" class="form-input mt-4" placeholder="Or type new tech + Enter...">
+                        <label class="block text-sm font-bold font-['Space_Mono'] uppercase mb-2">1. Technology</label>
+                        <div class="flex gap-4">
+                            <select id="evaluate-tech-select" class="form-input flex-grow"></select>
+                            <!-- <input type="text" id="new-technology-input" class="form-input w-1/3" placeholder="New tech?"> -->
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2 font-mono">Missing a tool? Type name & press Enter: <input type="text" id="new-technology-input" class="border-b border-black outline-none bg-transparent font-bold"></p>
                     </div>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -344,14 +372,37 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-bold font-['Space_Mono'] uppercase mb-2">What does it help with?</label>
-                        <input type="search" id="evaluate-features-search" class="form-input mb-4" placeholder="Search features...">
-                        <div id="evaluate-features-container" class="p-4 border-[2px] border-black bg-gray-50 max-h-48 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-2"></div>
+                        <label class="block text-sm font-bold font-['Space_Mono'] uppercase mb-2">2. What function does it support?</label>
+                        <p class="text-xs font-mono text-gray-500 mb-4">Click a category to see relevant features.</p>
+                        
+                        <!-- Function Tabs -->
+                        <div id="evaluate-function-tabs" class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
+                            <!-- Injected by JS -->
+                        </div>
+
+                        <!-- Feature Selection Area -->
+                        <div id="evaluate-feature-selection-area" class="p-4 border-[2px] border-black bg-gray-50 min-h-[200px] relative">
+                            <div id="feature-list-placeholder" class="absolute inset-0 flex items-center justify-center text-gray-400 font-mono text-center p-4">
+                                Select a function above to<br>view and add features.
+                            </div>
+                            <div id="active-feature-list" class="grid grid-cols-1 md:grid-cols-2 gap-2 hidden">
+                                <!-- Injected by JS -->
+                            </div>
+                             <div id="add-feature-wrapper" class="mt-4 pt-4 border-t-2 border-gray-200 hidden">
+                                <label class="text-xs font-bold uppercase">Add new feature to this category:</label>
+                                <div class="flex gap-2 mt-1">
+                                    <input type="text" id="new-feature-input" class="form-input !py-1 !text-sm" placeholder="e.g. 'Manage shifts'">
+                                    <button id="add-new-feature-btn" class="action-button !py-1 !px-3 text-xs">ADD</button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Hidden tracker for all selected features across tabs -->
+                        <div id="selected-features-display" class="mt-2 flex flex-wrap gap-2 min-h-[2rem]"></div>
                     </div>
                     
                     <div id="conviviality-questions" class="pt-6 border-t-4 border-black">
                          <div class="flex justify-between items-baseline mb-6">
-                            <label class="text-lg font-bold uppercase bg-black text-white px-2 py-1">Conviviality Score</label>
+                            <label class="text-lg font-bold uppercase bg-black text-white px-2 py-1">3. Conviviality Score</label>
                             <span class="text-xs font-['Space_Mono'] border border-black px-2 py-1 bg-white">Ref: Vetter (2018)</span>
                          </div>
                          <div id="conviviality-sliders-container" class="space-y-6"></div>
@@ -571,6 +622,9 @@
             ]
         };
 
+        let currentEvalFeatureIds = new Set();
+        let currentEvalActiveFunctionId = null;
+
         const dataService = {
             getVersion: () => appData.version,
             incrementVersion: () => { appData.version = parseFloat((appData.version + 0.1).toFixed(1)); },
@@ -598,6 +652,7 @@
                 const newFeature = { id: `f${Date.now()}`, name, functionId, isNew: true };
                 appData.features.push(newFeature);
                 renderLogo(); // Re-render logo on change
+                return newFeature;
             },
             addTechnology: (name) => {
                 const newTech = { id: Date.now(), name, evaluations: [] };
@@ -690,8 +745,19 @@
         const evaluateTechSelect = document.getElementById('evaluate-tech-select');
         const newTechnologyInput = document.getElementById('new-technology-input');
         const evaluateTechProficiency = document.getElementById('evaluate-tech-proficiency');
-        const evaluateFeaturesSearch = document.getElementById('evaluate-features-search');
-        const evaluateFeaturesContainer = document.getElementById('evaluate-features-container');
+        
+        // Removed global features search
+        // const evaluateFeaturesSearch = document.getElementById('evaluate-features-search');
+        // const evaluateFeaturesContainer = document.getElementById('evaluate-features-container');
+
+        const evaluateFunctionTabs = document.getElementById('evaluate-function-tabs');
+        const activeFeatureList = document.getElementById('active-feature-list');
+        const featureListPlaceholder = document.getElementById('feature-list-placeholder');
+        const addFeatureWrapper = document.getElementById('add-feature-wrapper');
+        const newFeatureInput = document.getElementById('new-feature-input');
+        const addNewFeatureBtn = document.getElementById('add-new-feature-btn');
+        const selectedFeaturesDisplay = document.getElementById('selected-features-display');
+
         const saveEvaluationButton = document.getElementById('save-evaluation-button');
         const evaluationComment = document.getElementById('evaluation-comment');
         const convivialitySlidersContainer = document.getElementById('conviviality-sliders-container');
@@ -994,10 +1060,12 @@
 
         const renderEvaluateView = () => {
             renderTechnologyDropdown();
-            renderEvaluateFeatures();
+            // renderEvaluateFeatures(); // OLD LOGIC
+            renderFunctionSelector(); // NEW LOGIC
             renderConvivialitySliders();
             updateSliderDisplay(evaluateTechSlider, evaluateTechDisplay, 'tech');
             updateSliderDisplay(evaluateSizeSlider, evaluateSizeDisplay, 'size');
+            renderSelectedFeaturesDisplay();
         };
 
         const renderTechnologyDropdown = () => {
@@ -1010,18 +1078,92 @@
             });
         };
         
-        const renderEvaluateFeatures = (searchTerm = '') => {
-            const lowerCaseSearchTerm = searchTerm.toLowerCase();
-            const allFeatures = dataService.getFeatures();
-            evaluateFeaturesContainer.innerHTML = allFeatures
-                .filter(feat => feat.name.toLowerCase().includes(lowerCaseSearchTerm))
-                .map(feat => `
-                <label class="flex items-start space-x-2 text-sm p-1 hover:bg-purple-50 rounded cursor-pointer border border-transparent hover:border-black transition-all">
-                    <input type="checkbox" value="${feat.id}" class="feature-checkbox mt-1">
-                    <span class="font-['Space_Mono']">${feat.name}</span>
-                </label>
+        // --- NEW EVALUATION LOGIC ---
+        const renderFunctionSelector = () => {
+            evaluateFunctionTabs.innerHTML = dataService.getFunctions().map(f => `
+                <div class="function-tab" data-func-id="${f.id}" style="border-color:${f.color}">
+                    ${f.name}
+                </div>
             `).join('');
+            
+            // Add click listeners
+            document.querySelectorAll('.function-tab').forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    document.querySelectorAll('.function-tab').forEach(t => t.classList.remove('active'));
+                    e.currentTarget.classList.add('active');
+                    renderFeaturesForFunction(e.currentTarget.dataset.funcId);
+                });
+            });
         };
+
+        const renderFeaturesForFunction = (functionId) => {
+            currentEvalActiveFunctionId = functionId;
+            featureListPlaceholder.classList.add('hidden');
+            activeFeatureList.classList.remove('hidden');
+            addFeatureWrapper.classList.remove('hidden');
+            
+            const funcFeatures = dataService.getFeaturesByFunction(functionId);
+            
+            activeFeatureList.innerHTML = funcFeatures.map(feat => {
+                const isChecked = currentEvalFeatureIds.has(feat.id) ? 'checked' : '';
+                return `
+                <label class="flex items-start space-x-2 text-sm p-2 hover:bg-yellow-50 rounded cursor-pointer border border-transparent hover:border-black transition-all">
+                    <input type="checkbox" value="${feat.id}" class="feature-checkbox mt-1 eval-feature-check" ${isChecked}>
+                    <span class="font-['Space_Mono']">${feat.name}</span>
+                </label>`;
+            }).join('');
+            
+            // Add listeners to checkboxes to sync with Set
+            document.querySelectorAll('.eval-feature-check').forEach(cb => {
+                cb.addEventListener('change', (e) => {
+                    if (e.target.checked) currentEvalFeatureIds.add(e.target.value);
+                    else currentEvalFeatureIds.delete(e.target.value);
+                    renderSelectedFeaturesDisplay();
+                });
+            });
+        };
+
+        const renderSelectedFeaturesDisplay = () => {
+            selectedFeaturesDisplay.innerHTML = '';
+            if (currentEvalFeatureIds.size === 0) return;
+            
+            selectedFeaturesDisplay.innerHTML = '<span class="text-xs font-bold uppercase w-full">Selected features so far:</span>';
+            currentEvalFeatureIds.forEach(fid => {
+                const feat = dataService.getFeatureById(fid);
+                if(feat) {
+                    const tag = document.createElement('span');
+                    tag.className = 'tag bg-white flex items-center gap-1';
+                    tag.innerHTML = `${feat.name} <button class="text-red-500 hover:text-red-700 ml-1 font-bold" data-remove="${fid}">×</button>`;
+                    selectedFeaturesDisplay.appendChild(tag);
+                }
+            });
+            
+            // Remove listener
+            selectedFeaturesDisplay.querySelectorAll('button').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const fid = e.target.dataset.remove;
+                    currentEvalFeatureIds.delete(fid);
+                    renderSelectedFeaturesDisplay();
+                    // If we are currently viewing the tab for this feature, uncheck the box
+                    const activeCheckbox = document.querySelector(`.eval-feature-check[value="${fid}"]`);
+                    if(activeCheckbox) activeCheckbox.checked = false;
+                });
+            });
+        };
+
+        addNewFeatureBtn.addEventListener('click', () => {
+            const name = newFeatureInput.value.trim();
+            if(!name || !currentEvalActiveFunctionId) return;
+            
+            const newFeat = dataService.addFeature(name, currentEvalActiveFunctionId);
+            currentEvalFeatureIds.add(newFeat.id); // Auto select
+            newFeatureInput.value = '';
+            renderFeaturesForFunction(currentEvalActiveFunctionId); // Re-render list
+            renderSelectedFeaturesDisplay();
+            renderLogo(); // Update logo in header
+        });
+
+        // --- END NEW EVALUATION LOGIC ---
         
         const renderTechnologiesList = (container, viewName) => {
             container.innerHTML = '';
@@ -1396,9 +1538,12 @@
             }
         });
         
+        // OLD SEARCH LOGIC REMOVED
+        /*
         evaluateFeaturesSearch.addEventListener('keyup', (e) => {
             renderEvaluateFeatures(e.target.value);
         });
+        */
         
         saveEvaluationButton.addEventListener('click', () => {
             saveErrorMessage.classList.add('hidden');
@@ -1421,7 +1566,7 @@
                 groupSize: parseInt(evaluateSizeSlider.value),       // Use slider value
                 convivialityScore: avgConvScore,
                 comment: evaluationComment.value,
-                features: Array.from(document.getElementById('evaluate-features-container').querySelectorAll('input:checked')).map(cb => cb.value)
+                features: Array.from(currentEvalFeatureIds) // Use our Set instead of DOM
             };
             
             dataService.addEvaluation(techId, newEvaluation);
@@ -1434,9 +1579,10 @@
             // Clear form
             const form = document.getElementById('evaluate-form-container');
             form.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
-            form.querySelectorAll('textarea, input[type="search"]').forEach(t => t.value = '');
-            // Uncheck boxes
-            form.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+            form.querySelectorAll('textarea').forEach(t => t.value = '');
+            // Uncheck boxes and clear set
+            currentEvalFeatureIds.clear();
+            renderSelectedFeaturesDisplay();
             // Reset sliders
             convSliders.forEach(s => {
                 s.value = 5;
@@ -1447,7 +1593,11 @@
             evaluateTechSlider.value = 3; updateSliderDisplay(evaluateTechSlider, evaluateTechDisplay, 'tech');
             evaluateSizeSlider.value = 2; updateSliderDisplay(evaluateSizeSlider, evaluateSizeDisplay, 'size');
 
-            renderEvaluateFeatures();
+            // Reset tabs
+            document.querySelectorAll('.function-tab').forEach(t => t.classList.remove('active'));
+            activeFeatureList.classList.add('hidden');
+            addFeatureWrapper.classList.add('hidden');
+            featureListPlaceholder.classList.remove('hidden');
         });
         
         const handleCommentToggle = (event) => {
