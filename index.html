@@ -9,7 +9,8 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Replaced Permanent Marker with Reenie Beanie for Shrigley vibe -->
+    <link href="https://fonts.googleapis.com/css2?family=Reenie+Beanie&family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;600&display=swap" rel="stylesheet">
 
     <style>
         :root {
@@ -202,7 +203,8 @@
         .logo-bubble:hover { transform: scale(1.1); z-index: 10; cursor: pointer; }
 
         .handwriting-font {
-            font-family: 'Permanent Marker', cursive;
+            font-family: 'Reenie Beanie', cursive;
+            font-weight: 400;
         }
 
         .tag {
@@ -251,7 +253,8 @@
                     </div>
                     <div class="flex items-center justify-center md:justify-end">
                         <div class="transform rotate-[-3deg] bg-white p-6 border-[3px] border-black shadow-[8px_8px_0px_0px_#000]">
-                            <p class="text-4xl md:text-5xl text-black handwriting-font leading-tight text-center transform rotate-3">
+                            <!-- Updated font class to Reenie Beanie -->
+                            <p class="text-5xl md:text-6xl text-black handwriting-font leading-none text-center transform rotate-3 pt-2">
                                 the more we<br>share the more<br>we have
                             </p>
                         </div>
@@ -540,6 +543,22 @@
                 ]},
                 { id: 22, name: 'Thingiverse', isOpenSource: false, evaluations: [
                     { techProficiency: 3, groupSize: 5, convivialityScore: 4.0, comment: "Massive library of 3D designs, but corporate-owned.", features: ['f_3d'] }
+                ]},
+                // Added new technologies based on user request
+                { id: 23, name: 'Coda', isOpenSource: false, evaluations: [
+                    { techProficiency: 3, groupSize: 3, convivialityScore: 4.0, comment: "Powerful, but creates dependency on their platform. Proprietary.", features: ['f7', 'f6', 'f_calc', 'f_form'] }
+                ]},
+                { id: 24, name: 'Loomio', isOpenSource: true, evaluations: [
+                    { techProficiency: 2, groupSize: 4, convivialityScore: 9.5, comment: "The gold standard for asynchronous democratic decision making.", features: ['f_decide', 'f2'] }
+                ]},
+                { id: 25, name: 'Miro', isOpenSource: false, evaluations: [
+                    { techProficiency: 2, groupSize: 3, convivialityScore: 5.0, comment: "Visually great for brainstorming, but proprietary and gets expensive.", features: ['f_map', 'f3'] }
+                ]},
+                { id: 26, name: 'Slack', isOpenSource: false, evaluations: [
+                    { techProficiency: 3, groupSize: 4, convivialityScore: 3.5, comment: "Standard for tech groups, but history disappears on free plan. Addictive.", features: ['f1', 'f2', 'f_git'] }
+                ]},
+                { id: 27, name: 'Messenger', isOpenSource: false, evaluations: [
+                    { techProficiency: 1, groupSize: 2, convivialityScore: 1.5, comment: "Very low conviviality. Conversations get lost in the flow. Data extraction concerns.", features: ['f1', 'f2'] }
                 ]}
             ],
             // Modified per Vetter (2018)
