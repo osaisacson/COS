@@ -69,8 +69,6 @@
                 <!-- SVG/Bubbles injected by JS -->
             </div>
             <nav class="flex flex-wrap justify-center space-x-6 text-sm font-medium text-gray-500">
-                <a href="#assemble" class="nav-link hover:text-black transition-colors">Assemble</a>
-                <a href="#evaluate" class="nav-link hover:text-black transition-colors">Evaluate</a>
                 <a href="#technologies" class="nav-link hover:text-black transition-colors">All technologies</a>
             </nav>
         </header>
@@ -81,7 +79,7 @@
                 <div class="grid md:grid-cols-2 gap-12 py-12 items-center">
                     <div class="flex flex-col justify-center">
                         <h1 class="text-5xl md:text-6xl font-bold leading-tight tracking-tight text-gray-900">Convivial<br>Operating<br>Stack</h1>
-                        <p class="mt-6 text-xl md:text-2xl text-gray-600 font-light">An evolving toolbox of technologies used by countercultures.</p>
+                        <p class="mt-6 text-xl md:text-2xl text-gray-600 font-light">A toolbox of technologies tried and tested by countercultures.</p>
                     </div>
                     <div class="flex items-center justify-center md:justify-end">
                         <div class="transform rotate-[-6deg]">
@@ -92,8 +90,7 @@
                     </div>
                 </div>
                 <div class="text-gray-600 space-y-4 text-sm border-t border-gray-100 pt-12 mt-4 max-w-4xl">
-                     <p>The COS is a method for guiding post-growth organisations towards technologies that support their operation - making aspects such as managing a shared economy, communicate with dispersed members or sharing a commons easier.</p>
-                     <p>The intention is to facilitate the emergence, functioning and flourishing of groups exploring alternative futures to the present, and strengthen their impact.</p>
+                     <p>The COS is a toolbox of technologies that makes it easier to emerge, exist and evolve as a counterculture to the growth paradigm. It is simply a tool to look at what technologies might work for you (or not work for you).</p>
                      
                      <div class="flex flex-col md:flex-row gap-6 items-center pt-8">
                         <a href="#assemble" class="action-button nav-link shadow-xl bg-gray-900 text-lg px-8 py-4">Assemble your Convivial Operating Stack</a>
@@ -118,7 +115,7 @@
                                 <input type="checkbox" id="assemble-floss-filter" class="feature-checkbox h-5 w-5 text-teal-600 rounded">
                                 <span class="text-sm font-bold text-teal-900">Strictly Open Source</span>
                             </label>
-                            <p class="text-xs text-teal-600 mt-1 ml-8">Only show Fully Free/Libre Open Source technologies.</p>
+                            <p class="text-xs text-teal-600 mt-1 ml-8">Only show Open Source</p>
                         </div>
 
                         <div class="slider-container">
@@ -129,7 +126,7 @@
                         <div class="slider-container">
                             <label class="slider-label">Group Size</label>
                             <input type="range" id="assemble-size-slider" min="1" max="5" step="1" value="2">
-                            <div id="assemble-size-display" class="slider-value-display">Working Group (6-15)</div>
+                            <div id="assemble-size-display" class="slider-value-display">Smallish Group (6-15)</div>
                         </div>
 
                         <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4 mt-8">Features Needed</h3>
@@ -139,7 +136,7 @@
                 </div>
                 <div>
                     <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Recommended Stack</h3>
-                    <p class="text-gray-600 mb-6 text-sm">Technologies ranked by how well they match your selection and constraints.</p>
+                    <p class="text-gray-600 mb-6 text-sm">Technologies ranked by how well they match what you need.</p>
                     <div id="assemble-results-container" class="space-y-8"></div>
                 </div>
             </div>
@@ -149,7 +146,7 @@
         <section id="evaluate-page" class="page-content">
              <div class="max-w-2xl mx-auto">
                 <h2 class="text-3xl font-bold mb-2">Evaluation</h2>
-                <p class="text-gray-500 mb-8">Contribute to the commons by reviewing a technology.</p>
+                <p class="text-gray-500 mb-8">Share your experience of specific technologies.</p>
                 
                 <div id="evaluate-form-container" class="space-y-6 bg-gray-50 p-8 rounded-xl border border-gray-100">
                     <div>
@@ -167,10 +164,10 @@
                             </div>
                         </div>
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Optimal Group Size</label>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Used for group size</label>
                             <div class="bg-white p-3 border rounded">
                                 <input type="range" id="evaluate-size-slider" min="1" max="5" step="1" value="2" class="w-full">
-                                <div id="evaluate-size-display" class="text-xs text-center font-bold mt-1 text-purple-600">Working Group (6-15)</div>
+                                <div id="evaluate-size-display" class="text-xs text-center font-bold mt-1 text-purple-600">Smallish Group (6-15)</div>
                             </div>
                         </div>
                     </div>
@@ -190,7 +187,10 @@
                         <textarea id="evaluation-comment" class="form-input bg-white" rows="3" placeholder="Your review of how this was useful/not useful for your group."></textarea>
                     </div>
                     <div id="conviviality-questions" class="pt-4 border-t border-gray-200">
-                         <label class="block text-sm font-semibold text-gray-700 mb-4">Conviviality Score</label>
+                         <div class="flex justify-between items-baseline mb-4">
+                            <label class="block text-sm font-semibold text-gray-700">Conviviality Score</label>
+                            <span class="text-xs text-gray-400 italic">Based on the Matrix of Convivial Technology (Vetter, 2018)</span>
+                         </div>
                          <div id="conviviality-sliders-container" class="space-y-5"></div>
                     </div>
                     <div class="pt-4">
@@ -248,7 +248,7 @@
     document.addEventListener('DOMContentLoaded', () => {
         // --- DATA ---
         const appData = {
-            version: 1.6,
+            version: 1.7,
             // Colors: Magenta, Purple, Teal, Yellow
             functions: [
                 { id: 'commons', name: 'Collaborative Commons', color: '#db2777', accent: 'accent-pink-600' }, // Magenta (pink-600)
@@ -383,10 +383,13 @@
                 { id: 'p2', name: 'Own property' },
                 { id: 'p3', name: 'Be self-sufficient in energy' }
             ],
+            // Modified per Vetter (2018)
             convivialityQuestions: [
-                { id: 'ease', question: 'Is it easy to learn and use?' },
-                { id: 'adaptation', question: 'Does it allow for user modification and adaptation?' },
-                { id: 'autonomy', question: 'Does it respect user autonomy and privacy?' },
+                { id: 'relatedness', question: 'Relatedness: Does it help us relate to each other?' },
+                { id: 'accessibility', question: 'Accessibility: Can anyone access and understand it?' },
+                { id: 'adaptability', question: 'Adaptability: Can we adapt and repair it?' },
+                { id: 'biointeraction', question: 'Bio-interaction: Is it compatible with life?' },
+                { id: 'appropriateness', question: 'Appropriateness: Does it fit our specific situation?' },
             ]
         };
 
