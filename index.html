@@ -90,7 +90,7 @@
                     </div>
                 </div>
                 <div class="text-gray-600 space-y-4 text-sm border-t border-gray-100 pt-12 mt-4 max-w-4xl">
-                     <p>The COS is a continously evolving toolbox that various post-growth groups are using as their technological infrastructure. It supports methodological luddism - to help choose which technologies you actually need, and which you don't need.</p>
+                     <p>The COS is a continously evolving toolbox of what various post-growth groups are using as technological infrastructure. It supports methodological luddism - helping to choose what technologies you actually need, and what you don't need.</p>
                      
                      <div class="flex flex-col md:flex-row gap-6 items-center pt-8">
                         <a href="#assemble" class="action-button nav-link shadow-xl bg-gray-900 text-lg px-8 py-4">Assemble your Convivial Operating Stack</a>
@@ -110,14 +110,6 @@
                     <div class="sticky top-4">
                         <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Your Group</h3>
                         
-                        <div class="mb-6 p-4 bg-teal-50 border border-teal-100 rounded-lg">
-                            <label class="flex items-center space-x-3 cursor-pointer">
-                                <input type="checkbox" id="assemble-floss-filter" class="feature-checkbox h-5 w-5 text-teal-600 rounded">
-                                <span class="text-sm font-bold text-teal-900">Strictly Open Source</span>
-                            </label>
-                            <p class="text-xs text-teal-600 mt-1 ml-8">Only show Open Source</p>
-                        </div>
-
                         <div class="slider-container">
                             <label class="slider-label">Technology knowledge</label>
                             <input type="range" id="assemble-tech-slider" min="1" max="5" step="1" value="3">
@@ -128,7 +120,13 @@
                             <input type="range" id="assemble-size-slider" min="1" max="5" step="1" value="2">
                             <div id="assemble-size-display" class="slider-value-display">Smallish Group (6-15)</div>
                         </div>
-
+                        <div class="mb-6 p-4 bg-teal-50 border border-teal-100 rounded-lg">
+                            <label class="flex items-center space-x-3 cursor-pointer">
+                                <input type="checkbox" id="assemble-floss-filter" class="feature-checkbox h-5 w-5 text-teal-600 rounded">
+                                <span class="text-sm font-bold text-teal-900">Strictly Open Source</span>
+                            </label>
+                            <p class="text-xs text-teal-600 mt-1 ml-8">Only show Open Source</p>
+                        </div>
                         <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4 mt-8">Features Needed</h3>
                         <p class="text-gray-600 mb-6 text-sm">Select the features useful to your group.</p>
                         <div id="assemble-features-container" class="space-y-3 max-h-[40vh] overflow-y-auto pr-2"></div>
