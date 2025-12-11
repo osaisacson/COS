@@ -47,6 +47,7 @@
             border-radius: var(--radius);
             box-shadow: var(--shadow-offset) var(--shadow-offset) 0px 0px #000;
             transition: all 0.2s ease;
+            position: relative; /* Context for color bar */
         }
         .neo-card:hover {
             box-shadow: 6px 6px 0px 0px #000;
@@ -86,6 +87,8 @@
             display: inline-block; 
             text-align: center; 
             cursor: pointer; 
+            position: relative; /* Ensure z-index works */
+            z-index: 10;
         }
         .action-button:hover { 
             background-color: #f0f0f0;
@@ -111,6 +114,7 @@
             display: grid;
             place-content: center;
             cursor: pointer;
+            transition: all 0.2s;
         }
         .feature-checkbox::before {
             content: "";
@@ -118,10 +122,18 @@
             height: 0.75rem;
             transform: scale(0);
             transition: 120ms transform ease-in-out;
-            box-shadow: inset 1em 1em #000; /* Checkmark color */
+            box-shadow: inset 1em 1em #000; /* Default Checkmark color */
         }
         .feature-checkbox:checked::before {
             transform: scale(1);
+        }
+
+        /* Dynamic Checkbox Colors - applied when inside a container with --active-color set */
+        .feature-checkbox-dynamic:checked {
+            border-color: var(--active-color, #000);
+        }
+        .feature-checkbox-dynamic:checked::before {
+            box-shadow: inset 1em 1em var(--active-color, #000);
         }
         
         /* Sliders */
@@ -218,6 +230,30 @@
             text-transform: uppercase;
             box-shadow: 2px 2px 0px 0px #000;
         }
+        
+        /* Clothing Tag Style for Version */
+        @keyframes slideTagOut {
+            0% { transform: translateX(-40px); opacity: 0; }
+            100% { transform: translateX(0); opacity: 1; }
+        }
+
+        .version-tag {
+            background-color: #facc15; /* yellow-400 */
+            border: 2px solid #000;
+            color: black;
+            font-family: 'Space Mono', monospace;
+            font-weight: 700;
+            font-size: 0.75rem;
+            padding: 0.35rem 0.75rem 0.35rem 1.5rem; /* Left padding for overlap */
+            margin-left: -1rem; /* Tuck behind */
+            z-index: 0; /* Behind button */
+            border-radius: 0 4px 4px 0;
+            position: relative;
+            box-shadow: 2px 2px 0px 0px #000;
+            text-align: right;
+            min-width: 80px;
+            animation: slideTagOut 1s ease-out 0.8s backwards; /* Triggered on load with delay */
+        }
 
         .new-flag { background-color: #22c55e; color: black; border-color: black; }
 
@@ -245,8 +281,10 @@
         }
         .function-tab.active {
             opacity: 1;
-            background-color: black;
+            /* Active now uses the function color */
+            background-color: var(--func-color);
             color: white;
+            border-color: var(--func-color);
             box-shadow: 4px 4px 0px 0px #000;
         }
         
@@ -277,7 +315,7 @@
             <section id="hero-section">
                 <div class="grid md:grid-cols-2 gap-6 py-4 items-center">
                     <div class="flex flex-col justify-center">
-                        <h1 class="text-6xl md:text-7xl font-bold leading-none tracking-tighter text-black mb-2">
+                        <h1 class="text-5xl md:text-7xl font-bold leading-none tracking-tighter text-black mb-2">
                             CONVIVIAL<br>OPERATING<br>STACK
                         </h1>
                         <div class="border-l-4 border-black pl-6 py-2">
@@ -293,14 +331,17 @@
                         </div>
                     </div>
                 </div>
-                <div class="text-black space-y-2 text-lg border-t-4 border-black pt-4 mt-2 max-w-4xl">
+                <!-- Removed top border here as requested -->
+                <div class="text-black space-y-2 text-lg mt-2 max-w-4xl">
                      <p>The COS is a continously evolving toolbox of what various post-growth groups are using as technological infrastructure. It supports methodological luddism - helping to choose what technologies you actually need, and what you <strong>don't</strong> need.</p>
                      
-                     <div class="flex flex-col md:flex-row gap-6 items-center pt-4">
-                        <a href="#assemble" class="action-button primary text-xl px-8 py-4">Assemble your Stack</a>
+                     <div class="flex flex-col md:flex-row gap-6 items-center pt-8">
+                        <a href="#assemble" class="action-button primary text-xl px-8 py-4 w-full md:w-auto">Assemble your Stack</a>
                         <span class="text-black italic font-serif text-lg">or</span>
-                        <a href="#evaluate" class="action-button text-lg px-8 py-4">Evaluate Tools</a>
-                        <span id="version-tracker" class="tag bg-yellow-400"></span>
+                        <div class="flex items-center w-full md:w-auto justify-center md:justify-start">
+                            <a href="#evaluate" class="action-button text-lg px-8 py-4 z-10 relative w-full md:w-auto">Evaluate Tools</a>
+                            <span id="version-tracker" class="version-tag"></span>
+                        </div>
                      </div>
                 </div>
             </section>
@@ -312,7 +353,7 @@
             <div class="grid md:grid-cols-12 gap-12 relative">
                 <!-- Sidebar -->
                 <div class="md:col-span-5 lg:col-span-4">
-                    <div class="sticky top-4 space-y-6">
+                    <div class="md:sticky md:top-4 space-y-6">
                         <!-- Updated Header: Simple Text -->
                         <h3 class="text-xl font-bold font-['Space_Grotesk'] uppercase mb-4">Your group</h3>
                         
@@ -330,7 +371,7 @@
                         <div class="mt-8">
                             <!-- Updated Header: Simple Text -->
                             <h3 class="text-xl font-bold font-['Space_Grotesk'] uppercase mb-4 mt-8">What do you need to do?</h3>
-                            <div id="assemble-features-container" class="space-y-2 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar"></div>
+                            <div id="assemble-features-container" class="space-y-2 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar border-t-2 border-b-2 border-gray-100 py-2"></div>
                         </div>
                     </div>
                 </div>
@@ -357,12 +398,11 @@
                     <p class="text-gray-600 font-['Space_Mono'] mt-2">Share your experience of specific technologies.</p>
                 </div>
                 
-                <div id="evaluate-form-container" class="space-y-8 bg-white p-8 border-[3px] border-black shadow-[8px_8px_0px_0px_#000]">
+                <div id="evaluate-form-container" class="space-y-8 bg-white p-4 md:p-8 border-[3px] border-black shadow-[8px_8px_0px_0px_#000]">
                     <div>
                         <label class="block text-sm font-bold font-['Space_Mono'] uppercase mb-2">1. Technology</label>
-                        <div class="flex gap-4">
+                        <div class="flex flex-col md:flex-row gap-4">
                             <select id="evaluate-tech-select" class="form-input flex-grow"></select>
-                            <!-- <input type="text" id="new-technology-input" class="form-input w-1/3" placeholder="New tech?"> -->
                         </div>
                         <p class="text-xs text-gray-500 mt-2 font-mono">Missing a tool? Type name & press Enter: <input type="text" id="new-technology-input" class="border-b border-black outline-none bg-transparent font-bold"></p>
                     </div>
@@ -1040,20 +1080,41 @@
                         const scores = t.aggData;
                         const convScoreText = scores.conviviality !== null ? scores.conviviality.toFixed(1) : '-';
                         const matchText = `${t.matchScore}/${selectedFeatureIds.length}`;
+                        
+                        // New Color Bar Logic
+                        let colorBarHTML = '';
+                        if (scores.functionIds && scores.functionIds.length > 0) {
+                            const uniqueFunctionIds = [...new Set(scores.functionIds)];
+                            colorBarHTML = `<div class="w-2 flex flex-col flex-shrink-0 border-r border-black">
+                                ${uniqueFunctionIds.map(fid => {
+                                    const f = dataService.getFunctions().find(fn => fn.id === fid);
+                                    return `<div class="flex-grow" style="background-color: ${f ? f.color : '#000'}"></div>`;
+                                }).join('')}
+                            </div>`;
+                        } else {
+                            // Default black bar if no function found (edge case)
+                            colorBarHTML = `<div class="w-2 bg-black flex-shrink-0"></div>`;
+                        }
+
                         return `
-                            <div class="neo-card mb-4 overflow-hidden">
-                                <div class="grid grid-cols-[1fr_auto] gap-4 items-center text-sm p-4 hover:bg-gray-50 transition-colors">
-                                    <div class="flex items-center tech-name-button font-bold text-lg font-['Space_Grotesk']" data-tech-id="${t.id}">
-                                        <span class="caret text-black mr-2">▶</span>
-                                        <span>${t.name}</span>
-                                        ${t.isOpenSource ? '<span class="ml-2 tag bg-green-200 border-black" title="Open Source">FLOSS</span>' : ''}
-                                    </div>
-                                    <div class="grid grid-cols-2 gap-6 font-['Space_Mono']">
-                                        <span class="font-bold w-16 text-center bg-black text-white rounded-sm py-1">${matchText}</span>
-                                        <span class="font-bold w-16 text-center py-1 border-2 border-black bg-white">${convScoreText}</span>
+                            <div class="neo-card mb-4 overflow-hidden flex flex-col">
+                                <div class="flex flex-row">
+                                    ${colorBarHTML}
+                                    <div class="flex-grow">
+                                        <div class="grid grid-cols-[1fr_auto] gap-4 items-center text-sm p-4 hover:bg-gray-50 transition-colors">
+                                            <div class="flex items-center tech-name-button font-bold text-lg font-['Space_Grotesk']" data-tech-id="${t.id}">
+                                                <span class="caret text-black mr-2">▶</span>
+                                                <span>${t.name}</span>
+                                                ${t.isOpenSource ? '<span class="ml-2 tag bg-green-200 border-black" title="Open Source">FLOSS</span>' : ''}
+                                            </div>
+                                            <div class="grid grid-cols-2 gap-6 font-['Space_Mono']">
+                                                <span class="font-bold w-16 text-center bg-black text-white rounded-sm py-1">${matchText}</span>
+                                                <span class="font-bold w-16 text-center py-1 border-2 border-black bg-white">${convScoreText}</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                                <div id="comments-assemble-${t.id}" class="hidden text-sm bg-gray-50 border-t-2 border-black p-4 font-['Space_Mono']"></div>
+                                <div id="comments-assemble-${t.id}" class="hidden text-sm bg-gray-50 border-t-2 border-black p-4 font-['Space_Mono'] ml-2"></div>
                             </div>
                         `;
                     }).join('');
@@ -1115,13 +1176,19 @@
             activeFeatureList.classList.remove('hidden');
             addFeatureWrapper.classList.remove('hidden');
             
+            // Get color and set CSS var
+            const func = dataService.getFunctions().find(f => f.id === functionId);
+            const color = func ? func.color : '#000';
+            const selectionArea = document.getElementById('evaluate-feature-selection-area');
+            selectionArea.style.setProperty('--active-color', color);
+
             const funcFeatures = dataService.getFeaturesByFunction(functionId);
             
             activeFeatureList.innerHTML = funcFeatures.map(feat => {
                 const isChecked = currentEvalFeatureIds.has(feat.id) ? 'checked' : '';
                 return `
                 <label class="flex items-start space-x-2 text-sm p-2 hover:bg-yellow-50 rounded cursor-pointer border border-transparent hover:border-black transition-all">
-                    <input type="checkbox" value="${feat.id}" class="feature-checkbox mt-1 eval-feature-check" ${isChecked}>
+                    <input type="checkbox" value="${feat.id}" class="feature-checkbox feature-checkbox-dynamic mt-1 eval-feature-check" ${isChecked}>
                     <span class="font-['Space_Mono']">${feat.name}</span>
                 </label>`;
             }).join('');
@@ -1205,71 +1272,106 @@
             `;
             container.innerHTML = headerHTML;
             
-            // Filter
-            let techList = dataService.getTechnologies();
-            if (techFilterOpenSource) {
-                techList = techList.filter(t => t.isOpenSource);
-            }
+            let contentHTML = '';
+            let hasResults = false;
 
-            // Sort
-            if (techSort.field) {
-                techList.sort((a, b) => {
-                    const scoreA = getAggregateData(a);
-                    const scoreB = getAggregateData(b);
-                    
-                    let valA, valB;
-                    if (techSort.field === 'conviviality') {
-                        valA = scoreA.conviviality || 0;
-                        valB = scoreB.conviviality || 0;
-                    } else { // tech
-                        valA = scoreA.proficiency || 0;
-                        valB = scoreB.proficiency || 0;
-                    }
-                    
-                    if (techSort.dir === 'asc') return valA - valB;
-                    else return valB - valA;
+            dataService.getFunctions().forEach(func => {
+                // 1. Get techs for this function
+                let groupTechs = dataService.getTechnologies().filter(t => {
+                    const agg = getAggregateData(t);
+                    return agg.functionIds.includes(func.id);
                 });
-            } else {
-                 // Default sort by name or grouped logic? Leaving as data order or basic name sort
-                 techList.sort((a,b) => a.name.localeCompare(b.name));
-            }
 
+                // 2. Filter
+                if (techFilterOpenSource) {
+                    groupTechs = groupTechs.filter(t => t.isOpenSource);
+                }
 
-            if (techList.length > 0) {
-                const techHTML = techList.map(t => {
-                    const scores = getAggregateData(t);
-                    const convScoreText = scores.conviviality !== null ? scores.conviviality.toFixed(1) : '-';
-                    const techScoreText = scores.proficiency !== null ? scores.proficiency.toFixed(1) : '-';
-                    
-                    // Determine which function color to use for the side border
-                    // If multiple, maybe just use first or gray? Let's use the first one.
-                    let borderColor = 'black';
-                    if (scores.functionIds && scores.functionIds.length > 0) {
-                        const func = dataService.getFunctions().find(f => f.id === scores.functionIds[0]);
-                        if(func) borderColor = func.color;
-                    }
+                // 3. Sort
+                if (techSort.field) {
+                    groupTechs.sort((a, b) => {
+                        const scoreA = getAggregateData(a);
+                        const scoreB = getAggregateData(b);
+                        let valA, valB;
+                        if (techSort.field === 'conviviality') {
+                            valA = scoreA.conviviality || 0;
+                            valB = scoreB.conviviality || 0;
+                        } else { // tech
+                            valA = scoreA.proficiency || 0;
+                            valB = scoreB.proficiency || 0;
+                        }
+                        
+                        if (techSort.dir === 'asc') return valA - valB;
+                        else return valB - valA;
+                    });
+                } else {
+                     // Default sort by name if no sort selected
+                     groupTechs.sort((a,b) => a.name.localeCompare(b.name));
+                }
 
-                    return `
-                    <div class="neo-card mb-4 overflow-hidden" style="border-left: 6px solid ${borderColor}">
-                        <div class="grid grid-cols-[1fr_auto] gap-4 items-center text-sm p-4 hover:bg-gray-50 transition-colors">
-                            <div class="flex items-center tech-name-button font-bold text-lg font-['Space_Grotesk']" data-tech-id="${t.id}">
-                                <span class="caret text-black mr-2">▶</span>
-                                <span>${t.name}</span>
-                                ${t.isOpenSource ? '<span class="ml-2 tag bg-green-200 border-black" title="Open Source">FLOSS</span>' : ''}
-                            </div>
-                            <div class="grid grid-cols-2 gap-6 font-['Space_Mono']">
-                               <span class="font-bold w-20 text-center py-1 border-2 border-black bg-white">${convScoreText}</span>
-                               <span class="font-bold w-20 text-center py-1 border-2 border-black bg-white">${techScoreText}</span>
-                            </div>
+                if (groupTechs.length > 0) {
+                    hasResults = true;
+                    // Header
+                    contentHTML += `
+                        <div class="flex items-center space-x-3 mb-4 mt-8 pb-2 border-b-4" style="border-color: ${func.color}">
+                            <div style="background-color: ${func.color}" class="w-4 h-4 border-2 border-black"></div>
+                            <h4 class="font-bold text-black text-lg uppercase tracking-wide font-['Space_Grotesk']">${func.name}</h4>
                         </div>
-                        <div id="comments-${viewName}-${t.id}" class="hidden text-sm bg-gray-50 border-t-2 border-black p-4 font-['Space_Mono']"></div>
-                    </div>
-                `}).join('');
-                
-                container.innerHTML += `<div class="space-y-4 mt-4">${techHTML}</div>`;
-            } else {
-                container.innerHTML += `<div class="text-center py-8 italic text-gray-500">No technologies found matching criteria.</div>`;
+                        <div class="space-y-4">
+                    `;
+
+                    // Cards
+                    contentHTML += groupTechs.map(t => {
+                        const scores = getAggregateData(t);
+                        const convScoreText = scores.conviviality !== null ? scores.conviviality.toFixed(1) : '-';
+                        const techScoreText = scores.proficiency !== null ? scores.proficiency.toFixed(1) : '-';
+                        
+                        // New Color Bar Logic
+                        let colorBarHTML = '';
+                        if (scores.functionIds && scores.functionIds.length > 0) {
+                            const uniqueFunctionIds = [...new Set(scores.functionIds)];
+                            colorBarHTML = `<div class="w-2 flex flex-col flex-shrink-0 border-r border-black">
+                                ${uniqueFunctionIds.map(fid => {
+                                    const f = dataService.getFunctions().find(fn => fn.id === fid);
+                                    return `<div class="flex-grow" style="background-color: ${f ? f.color : '#000'}"></div>`;
+                                }).join('')}
+                            </div>`;
+                        } else {
+                            // Default black bar if no function found (edge case)
+                            colorBarHTML = `<div class="w-2 bg-black flex-shrink-0"></div>`;
+                        }
+
+                        return `
+                        <div class="neo-card mb-4 overflow-hidden flex flex-col">
+                            <div class="flex flex-row">
+                                ${colorBarHTML}
+                                <div class="flex-grow">
+                                    <div class="grid grid-cols-[1fr_auto] gap-4 items-center text-sm p-4 hover:bg-gray-50 transition-colors">
+                                        <div class="flex items-center tech-name-button font-bold text-lg font-['Space_Grotesk']" data-tech-id="${t.id}">
+                                            <span class="caret text-black mr-2">▶</span>
+                                            <span>${t.name}</span>
+                                            ${t.isOpenSource ? '<span class="ml-2 tag bg-green-200 border-black" title="Open Source">FLOSS</span>' : ''}
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-6 font-['Space_Mono']">
+                                           <span class="font-bold w-20 text-center py-1 border-2 border-black bg-white">${convScoreText}</span>
+                                           <span class="font-bold w-20 text-center py-1 border-2 border-black bg-white">${techScoreText}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="comments-${viewName}-${t.id}" class="hidden text-sm bg-gray-50 border-t-2 border-black p-4 font-['Space_Mono'] ml-2"></div>
+                        </div>
+                    `}).join('');
+                    
+                    contentHTML += `</div>`;
+                }
+            });
+
+            if (!hasResults) {
+                contentHTML = `<div class="text-center py-8 italic text-gray-500">No technologies found matching criteria.</div>`;
             }
+            
+            container.innerHTML += contentHTML;
 
             // Attach listeners
             document.getElementById('tech-floss-filter').addEventListener('change', (e) => {
@@ -1302,14 +1404,16 @@
             adminDashboardContainer.innerHTML = `
                 <div class="space-y-16">
                     <!-- Functions -->
-                    <div class="neo-card p-6">
+                    <div class="neo-card p-6 overflow-x-auto">
                         <h3 class="text-2xl font-bold mb-6 flex items-center font-['Space_Grotesk'] uppercase border-b-2 border-black pb-2">
                             <span class="tag bg-black text-white mr-3">Core</span>Manage Functions
                         </h3>
-                        <table class="admin-table">
-                            <thead><tr><th>Name</th><th>Color</th><th class="w-40 text-right">Actions</th></tr></thead>
-                            <tbody id="admin-functions-body"></tbody>
-                        </table>
+                        <div class="overflow-x-auto">
+                            <table class="admin-table">
+                                <thead><tr><th>Name</th><th>Color</th><th class="w-40 text-right">Actions</th></tr></thead>
+                                <tbody id="admin-functions-body"></tbody>
+                            </table>
+                        </div>
                         <form id="add-function-form" class="mt-6 flex space-x-2">
                             <input type="text" placeholder="New function name" class="form-input flex-grow">
                             <button type="submit" class="action-button text-sm !py-2 !px-4">Add</button>
@@ -1320,10 +1424,12 @@
                         <h3 class="text-2xl font-bold mb-6 flex items-center font-['Space_Grotesk'] uppercase border-b-2 border-black pb-2">
                             <span class="tag bg-black text-white mr-3">Core</span>Manage Features
                         </h3>
-                        <table class="admin-table">
-                            <thead><tr><th>Name</th><th>Function</th><th>Used By</th><th class="w-40 text-right">Actions</th></tr></thead>
-                            <tbody id="admin-features-body"></tbody>
-                        </table>
+                        <div class="overflow-x-auto">
+                            <table class="admin-table">
+                                <thead><tr><th>Name</th><th>Function</th><th>Used By</th><th class="w-40 text-right">Actions</th></tr></thead>
+                                <tbody id="admin-features-body"></tbody>
+                            </table>
+                        </div>
                          <form id="add-feature-form" class="mt-6 flex space-x-2">
                             <input type="text" placeholder="New feature name" class="form-input flex-grow">
                             <select id="add-feature-function-select" class="form-input w-1/3 border-l-0"></select>
@@ -1335,10 +1441,12 @@
                          <h3 class="text-2xl font-bold mb-6 flex items-center font-['Space_Grotesk'] uppercase border-b-2 border-black pb-2">
                             <span class="tag bg-black text-white mr-3">Content</span>Manage Technologies
                          </h3>
-                        <table class="admin-table">
-                            <thead><tr><th>Name</th><th>Associated Features</th><th class="w-40 text-right">Actions</th></tr></thead>
-                            <tbody id="admin-technologies-body"></tbody>
-                        </table>
+                        <div class="overflow-x-auto">
+                            <table class="admin-table">
+                                <thead><tr><th>Name</th><th>Associated Features</th><th class="w-40 text-right">Actions</th></tr></thead>
+                                <tbody id="admin-technologies-body"></tbody>
+                            </table>
+                        </div>
                          <form id="add-technology-form" class="mt-6 flex space-x-2">
                             <input type="text" placeholder="New technology name" class="form-input flex-grow">
                             <button type="submit" class="action-button text-sm !py-2 !px-4">Add</button>
