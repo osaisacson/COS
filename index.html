@@ -683,7 +683,7 @@
                     fetchSheetData('Dictionary'), fetchSheetData('Library')
                 ]);
 
-                // Safely parse DB arrays to filter out empty structural rows like [{id: "", name: ""}] or [{id: "id", name: "name"}]
+                // Safely parse DB arrays to filter out empty structural rows
                 const safeParseDB = (dbArray, idKey = 'id') => {
                     if (!dbArray || !Array.isArray(dbArray) || dbArray.length === 0) return [];
                     return dbArray.filter(item => item[idKey] && String(item[idKey]).trim() !== '' && String(item[idKey]).toLowerCase() !== idKey.toLowerCase());
@@ -693,12 +693,10 @@
                 appData.features = safeParseDB(dbFeatures);
                 appData.compartments = safeParseDB(dbComps);
 
-                // Dynamic scales mapping safely from the database
                 appData.techProficiencyLevels = safeParseDB(dbTechLvl).map(t => ({ id: parseInt(t.id), name: t.name }));
                 appData.groupSizes = safeParseDB(dbGrpSize).map(g => ({ id: parseInt(g.id), name: g.name }));
                 appData.convivialityQuestions = safeParseDB(dbConv).map(c => ({ id: c.id, question: c.question }));
                 
-                // Folk mapping. Ensure "f1" always exists as an ultimate fallback if database is corrupted
                 let parsedFolk = safeParseDB(dbFolk);
                 if (!parsedFolk.find(f => f.id === 'f1')) {
                     parsedFolk.push({ id: "f1", email: "admin@cos.com", preferredName: "Admin", image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Admin", keyphrase: "ADMIN", categories: "tech,econ,cult,org,food,work,prod" });
@@ -707,7 +705,6 @@
                 }
                 appData.folk = parsedFolk;
 
-                // Safely map folkId, defaulting to the robust 'f1' Admin if missing
                 const assignDefaultFolk = (arr) => {
                     return safeParseDB(arr).map(item => ({
                         ...item,
@@ -755,7 +752,6 @@
             const escapeRegExp = (string) => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             
             terms.forEach(d => {
-                // Negative lookahead (?![^<]*>) ensures we don't accidentally match/replace text inside an HTML tag attribute
                 const regex = new RegExp(`(?![^<]*>)\\b(${escapeRegExp(d.term)})\\b`, 'gi');
                 result = result.replace(regex, `<span class="dict-link cursor-pointer text-[#e0e0e0] hover:text-white border-b border-dashed border-[#555] pb-[1px]" onclick="openDictionaryModal('${d.id}')">$1</span>`);
             });
@@ -1874,13 +1870,11 @@
                 addEvaluation: async (techId, evaluationData) => {
                     const tech = dataService.getTechnologyById(techId);
                     if (tech) {
-                        // Increment minor version logic on new evaluation
                         let parts = appData.currentVersion.split('.');
                         parts[2] = parseInt(parts[2] || 0) + 1;
                         appData.currentVersion = parts.join('.');
                         evaluationData.version = appData.currentVersion;
                         
-                        // Update UI version tracker immediately
                         const vTracker = document.getElementById('version-tracker');
                         if (vTracker) vTracker.textContent = appData.currentVersion;
 
@@ -1924,30 +1918,64 @@
             const technologiesListContainer = document.getElementById('technologies-list-container');
             const adminDashboardContainer = document.getElementById('admin-dashboard-container');
 
-            const getAggregateData = (technology) => {
+            // NEW: Context-aware Aggregation Logic
+            const getAggregateData = (technology, contextTech = null, contextSize = null) => {
                 const adminEval = technology.evaluations.find(ev => ev.isAdminAssigned);
-                const userEvals = technology.evaluations.filter(ev => !ev.isAdminAssigned);
-                const features = adminEval ? adminEval.features : [...new Set(userEvals.flatMap(ev => ev.features))];
+                let userEvals = technology.evaluations.filter(ev => !ev.isAdminAssigned);
+                let relevantEvals = userEvals;
+
+                // 1. Filter evaluations by the chosen Context (if provided during Assembly)
+                if (contextTech !== null && contextSize !== null) {
+                    let exactEvals = userEvals.filter(ev => ev.techProficiency === contextTech && ev.groupSize === contextSize);
+                    
+                    if (exactEvals.length > 0) {
+                        relevantEvals = exactEvals;
+                    } else {
+                        // Fallback to a variance of +/- 1 if no exact match exists for this intersection
+                        relevantEvals = userEvals.filter(ev => 
+                            Math.abs(ev.techProficiency - contextTech) <= 1 && 
+                            Math.abs((ev.groupSize || 2) - contextSize) <= 1
+                        );
+                    }
+                }
+
+                // 2. Derive Features from positive contextual reviews (and baseline admin features)
+                let posEvals = relevantEvals.filter(ev => ev.reviewType === 'positive');
+                let featureSet = new Set();
+                
+                if (adminEval) adminEval.features.forEach(f => featureSet.add(f));
+                posEvals.forEach(ev => ev.features.forEach(f => featureSet.add(f))); 
+                
+                // If it's heavily negative in this context, we still need features to know what it FAILED at supporting
+                if (posEvals.length === 0 && relevantEvals.length > 0) {
+                    relevantEvals.forEach(ev => ev.features.forEach(f => featureSet.add(f)));
+                }
+
+                const features = Array.from(featureSet);
                 const functionIds = [...new Set(features.map(featureId => {
                     const feature = dataService.getFeatureById(featureId);
                     return feature ? feature.functionId : null;
                 }).filter(Boolean))];
 
-                if (userEvals.length === 0) return { conviviality: null, proficiency: null, groupSize: null, features, functionIds, isNegative: false };
+                if (relevantEvals.length === 0) {
+                    return { conviviality: null, proficiency: null, groupSize: null, features, functionIds, isNegative: false, matchStrength: 0 };
+                }
 
-                const totalConv = userEvals.reduce((sum, ev) => sum + ev.convivialityScore, 0);
-                const totalProf = userEvals.reduce((sum, ev) => sum + ev.techProficiency, 0);
-                const totalSize = userEvals.reduce((sum, ev) => sum + (ev.groupSize || 2), 0); 
+                const totalConv = relevantEvals.reduce((sum, ev) => sum + ev.convivialityScore, 0);
+                const totalProf = relevantEvals.reduce((sum, ev) => sum + ev.techProficiency, 0);
+                const totalSize = relevantEvals.reduce((sum, ev) => sum + (ev.groupSize || 2), 0); 
                 
-                let negativeCount = userEvals.filter(ev => ev.reviewType === 'negative').length;
-                let positiveCount = userEvals.filter(ev => ev.reviewType === 'positive').length;
+                let negativeCount = relevantEvals.filter(ev => ev.reviewType === 'negative').length;
+                let positiveCount = posEvals.length;
                 
                 return {
-                    conviviality: totalConv / userEvals.length,
-                    proficiency: totalProf / userEvals.length,
-                    groupSize: totalSize / userEvals.length,
-                    features, functionIds,
-                    isNegative: negativeCount > positiveCount
+                    conviviality: totalConv / relevantEvals.length,
+                    proficiency: totalProf / relevantEvals.length,
+                    groupSize: totalSize / relevantEvals.length,
+                    features, 
+                    functionIds,
+                    isNegative: negativeCount > positiveCount, 
+                    matchStrength: relevantEvals.length
                 };
             };
             
@@ -1977,15 +2005,26 @@
                 });
             };
 
-            const calculateUsagePercentage = (techId) => {
-                if (!selectedAssembleTech || !selectedAssembleSize) return 0;
-                const typedEvals = dataService.getTechnologies().flatMap(t =>
-                    t.evaluations.filter(ev => !ev.isAdminAssigned).map(ev => ({...ev, techId: t.id}))
-                );
-                let exactEvals = typedEvals.filter(ev => ev.techProficiency === selectedAssembleTech && ev.groupSize === selectedAssembleSize);
-                if (exactEvals.length === 0) exactEvals = typedEvals.filter(ev => Math.abs(ev.techProficiency - selectedAssembleTech) <= 1 && Math.abs(ev.groupSize - selectedAssembleSize) <= 1);
-                if (exactEvals.length === 0) return 0;
-                return Math.round((exactEvals.filter(ev => ev.techId === techId).length / exactEvals.length) * 100);
+            const calculateUsagePercentage = (techId, contextTech, contextSize) => {
+                if (!contextTech || !contextSize) return 0;
+                
+                let allContextEvals = [];
+                let techContextEvals = 0;
+
+                dataService.getTechnologies().forEach(t => {
+                    const evals = t.evaluations.filter(ev => !ev.isAdminAssigned);
+                    let exactEvals = evals.filter(ev => ev.techProficiency === contextTech && ev.groupSize === contextSize);
+                    
+                    if (exactEvals.length === 0) {
+                        exactEvals = evals.filter(ev => Math.abs(ev.techProficiency - contextTech) <= 1 && Math.abs((ev.groupSize || 2) - contextSize) <= 1);
+                    }
+
+                    allContextEvals.push(...exactEvals);
+                    if (t.id === techId) techContextEvals = exactEvals.length;
+                });
+
+                if (allContextEvals.length === 0) return 0;
+                return Math.round((techContextEvals / allContextEvals.length) * 100);
             };
 
             const showPage = (pageId) => {
@@ -2036,7 +2075,6 @@
                     });
                     
                     wrapper.appendChild(label);
-                    // FIXED: Using insertAdjacentHTML preserves the event listeners attached to the label above
                     if (index < dataArray.length - 1) {
                         wrapper.insertAdjacentHTML('beforeend', `<span class="text-[#444] text-[8px] font-mono leading-none">▶</span>`);
                     }
@@ -2052,23 +2090,46 @@
             const checkAndGenerateStack = () => { if (selectedAssembleTech && selectedAssembleSize) generateDefaultStack(); };
 
             const generateDefaultStack = () => {
-                currentBaselineTools.clear(); baselineFeatureIds.clear(); activeFeatureIds.clear();
-                let exactPool = dataService.getTechnologies().map(t => ({ tech: t, agg: getAggregateData(t) }))
+                currentBaselineTools.clear(); 
+                baselineFeatureIds.clear(); 
+                activeFeatureIds.clear();
+
+                let exactPool = dataService.getTechnologies()
+                    .map(t => ({ tech: t, agg: getAggregateData(t, selectedAssembleTech, selectedAssembleSize) }))
                     .filter(item => assembleFlossFilter.checked ? item.tech.isOpenSource : true)
-                    .filter(item => Math.abs((item.agg.proficiency || 3) - selectedAssembleTech) <= 1 && Math.abs((item.agg.groupSize || 3) - selectedAssembleSize) <= 1);
+                    .filter(item => item.agg.matchStrength > 0 || item.agg.features.length > 0); 
 
                 let defaultTools = [];
+
                 dataService.getFunctions().forEach(func => {
-                    let pos = exactPool.filter(t => !t.agg.isNegative && t.agg.functionIds.includes(func.id)).sort((a,b) => b.agg.conviviality - a.agg.conviviality);
-                    let neg = exactPool.filter(t => t.agg.isNegative && t.agg.functionIds.includes(func.id)).sort((a,b) => a.agg.conviviality - b.agg.conviviality);
-                    if (pos.length > 0) defaultTools.push(pos[0]);
-                    if (neg.length > 0) defaultTools.push(...neg); 
+                    let toolsForFunc = exactPool.filter(item => item.agg.functionIds.includes(func.id));
+                    
+                    let posCandidates = toolsForFunc.filter(t => !t.agg.isNegative);
+                    let negCandidates = toolsForFunc.filter(t => t.agg.isNegative);
+
+                    posCandidates.sort((a, b) => {
+                        if (b.agg.conviviality !== a.agg.conviviality) return b.agg.conviviality - a.agg.conviviality;
+                        return b.agg.matchStrength - a.agg.matchStrength;
+                    });
+
+                    if (posCandidates.length > 0) {
+                        defaultTools.push(posCandidates[0]);
+                    } else if (negCandidates.length > 0) {
+                        negCandidates.sort((a, b) => a.agg.conviviality - b.agg.conviviality); 
+                        defaultTools.push(negCandidates[0]); 
+                    }
                 });
 
-                [...new Set(defaultTools)].forEach(item => {
+                const uniqueStack = [...new Set(defaultTools)];
+
+                uniqueStack.forEach(item => {
                     currentBaselineTools.add(item.tech.id);
-                    item.agg.features.forEach(f => { baselineFeatureIds.add(f); activeFeatureIds.add(f); });
+                    item.agg.features.forEach(f => { 
+                        baselineFeatureIds.add(f); 
+                        activeFeatureIds.add(f); 
+                    });
                 });
+                
                 renderAssembleResults();
             };
 
@@ -2088,11 +2149,12 @@
 
                 activeStackTechIds.clear();
                 currentBaselineTools.forEach(tId => {
-                    if (getAggregateData(dataService.getTechnologyById(tId)).features.some(f => activeFeatureIds.has(f))) activeStackTechIds.add(tId);
+                    const agg = getAggregateData(dataService.getTechnologyById(tId), selectedAssembleTech, selectedAssembleSize);
+                    if (agg.features.some(f => activeFeatureIds.has(f))) activeStackTechIds.add(tId);
                 });
 
                 if (activeStackTechIds.size === 0 && baselineFeatureIds.size === 0) {
-                     assembleResultsContainer.innerHTML = `<div class="p-6 border border-[#262626] text-[#ccc]"><h4 class="font-normal tracking-widest uppercase mb-2 font-['Space_Grotesk'] text-xl">NO MATCHES FOUND</h4><p class="font-['Space_Mono'] text-xs text-[#888]">Try adjusting settings or unchecking filter constraints.</p></div>`;
+                     assembleResultsContainer.innerHTML = `<div class="p-6 border border-[#262626] text-[#ccc]"><h4 class="font-normal tracking-widest uppercase mb-2 font-['Space_Grotesk'] text-xl">NO MATCHES FOUND</h4><p class="font-['Space_Mono'] text-xs text-[#888]">No tools have been evaluated for this exact specific combination of tech knowledge and group size yet.</p></div>`;
                      assembleFeatureManagement.classList.remove('hidden');
                      return;
                 }
@@ -2100,11 +2162,13 @@
                 assembleFeatureManagement.classList.remove('hidden');
                 assembleResultsContainer.innerHTML = `<div class="grid grid-cols-[1fr_auto] gap-4 text-[9px] md:text-[10px] text-white uppercase tracking-widest mb-4 border-b border-[#262626] pb-2 font-['Space_Mono']"><span class="w-max pb-1">Technology</span><div class="grid grid-cols-2 gap-6 w-40"><span class="text-center w-full block pb-1">Conviviality</span><span class="text-center w-full block pb-1">Usage %</span></div></div>`;
 
-                let stackTools = Array.from(activeStackTechIds).map(id => dataService.getTechnologyById(id)).sort((a,b) => (getAggregateData(b).conviviality||0) - (getAggregateData(a).conviviality||0));
+                let stackTools = Array.from(activeStackTechIds)
+                    .map(id => dataService.getTechnologyById(id))
+                    .sort((a,b) => (getAggregateData(b, selectedAssembleTech, selectedAssembleSize).conviviality||0) - (getAggregateData(a, selectedAssembleTech, selectedAssembleSize).conviviality||0));
 
                 assembleResultsContainer.innerHTML += stackTools.map(t => {
-                    const agg = getAggregateData(t);
-                    const usagePercent = calculateUsagePercentage(t.id);
+                    const agg = getAggregateData(t, selectedAssembleTech, selectedAssembleSize);
+                    const usagePercent = calculateUsagePercentage(t.id, selectedAssembleTech, selectedAssembleSize);
                     let convColorClass = 'text-[#aaa]';
                     let convScoreText = agg.conviviality !== null ? agg.conviviality.toFixed(1) : '-';
                     if (agg.conviviality !== null) convColorClass = agg.conviviality < 4 ? 'text-red-400' : (agg.conviviality < 7 ? 'text-yellow-400' : 'text-green-400');
@@ -2113,12 +2177,14 @@
                         ? `<div class="w-1 flex flex-col flex-shrink-0 border-r border-[#262626]">${[...new Set(agg.functionIds)].map(fid => `<div class="flex-grow" style="background-color: ${(dataService.getFunctions().find(fn => fn.id === fid)||{}).color || '#262626'}"></div>`).join('')}</div>` 
                         : `<div class="w-1 bg-[#262626] flex-shrink-0"></div>`;
 
-                    let bannerHTML = agg.isNegative ? `<div class="bg-[#111] text-red-400 text-[10px] font-mono px-4 py-2 uppercase tracking-widest border-b border-red-500/30 flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-red-500"></div>Don't use</div>` : '';
+                    let bannerHTML = agg.isNegative ? `<div class="bg-[#111] text-red-400 text-[10px] font-mono px-4 py-2 uppercase tracking-widest border-b border-red-500/30 flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-red-500"></div>Don't use in this context</div>` : '';
                     let featuresOutsideHTML = (!agg.isNegative && agg.features.filter(fid => activeFeatureIds.has(fid)).length > 0) 
                         ? `<ul class="ml-6 mt-2 mb-10 list-disc list-outside text-[#888] font-mono text-[10px] uppercase tracking-widest leading-relaxed">${agg.features.filter(fid => activeFeatureIds.has(fid)).map(fid => `<li>${dataService.getFeatureById(fid)?.name}</li>`).join('')}</ul>` 
                         : `<div class="${agg.isNegative ? 'mb-4' : 'mb-6'}"></div>`;
 
-                    const comments = t.evaluations.filter(ev => ev.comment && ev.comment.trim() !== '' && !ev.isAdminAssigned);
+                    const comments = t.evaluations.filter(ev => ev.comment && ev.comment.trim() !== '' && !ev.isAdminAssigned && 
+                        (Math.abs(ev.techProficiency - selectedAssembleTech) <= 1 && Math.abs(ev.groupSize - selectedAssembleSize) <= 1));
+                    
                     let commentsHTML = comments.length > 0 ? `<ul class="list-disc list-outside ml-4 mt-2 text-[#e0e0e0] font-['Inter'] text-xs md:text-sm normal-case space-y-2">${comments.map(ev => `<li><span class="text-[#555] font-mono text-[10px] mr-2">[v${ev.version || '1.0.0'}]</span>"${ev.comment}"</li>`).join('')}</ul>` : '<p class="text-[#555] font-mono italic uppercase tracking-widest text-[10px]">No reviews yet.</p>';
 
                     return `
